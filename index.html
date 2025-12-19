@@ -1044,7 +1044,7 @@
         }
 
         /* ========================================
-           STARFIELD
+           STARFIELD - CONTINUOUS MOTION
         ======================================== */
         const STAR_COLORS = ['#ffffff', '#00f2ff', '#7b2cbf', '#ff6b9d', '#ffd700'];
         const STAR_WEIGHTS = [0.60, 0.15, 0.10, 0.10, 0.05];
@@ -1065,12 +1065,14 @@
             }
 
             reset(initial) {
-                this.x = (Math.random() - 0.5) * W * 2;
-                this.y = (Math.random() - 0.5) * H * 2;
+                this.x = (Math.random() - 0.5) * W * 2.5;
+                this.y = (Math.random() - 0.5) * H * 2.5;
                 this.z = initial ? Math.random() * 2000 : 2000;
-                this.size = Math.random() * 2.2 + 0.5;
-                this.brightness = Math.random() * 0.6 + 0.4;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.brightness = Math.random() * 0.5 + 0.5;
                 this.color = getStarColor();
+                this.twinkleSpeed = Math.random() * 0.02 + 0.01;
+                this.twinkleOffset = Math.random() * Math.PI * 2;
             }
 
             update(speed) {
@@ -1078,24 +1080,27 @@
                 if (this.z <= 1) this.reset(false);
             }
 
-            draw() {
+            draw(time) {
                 const x = (this.x / this.z) * 600 + W / 2;
                 const y = (this.y / this.z) * 600 + H / 2;
                 const s = (1200 / this.z) * this.size;
-                const alpha = Math.min(1, (2000 - this.z) / 900) * this.brightness;
+                
+                // Twinkle effect
+                const twinkle = Math.sin(time * this.twinkleSpeed + this.twinkleOffset) * 0.15 + 0.85;
+                const alpha = Math.min(1, (2000 - this.z) / 800) * this.brightness * twinkle;
 
                 if (x < -50 || x > W + 50 || y < -50 || y > H + 50) return;
 
                 // Glow
-                const gradient = uCtx.createRadialGradient(x, y, 0, x, y, s * 3);
-                gradient.addColorStop(0, hexToRgba(this.color, 0.9));
-                gradient.addColorStop(0.4, hexToRgba(this.color, 0.2));
+                const gradient = uCtx.createRadialGradient(x, y, 0, x, y, s * 3.5);
+                gradient.addColorStop(0, hexToRgba(this.color, 0.95));
+                gradient.addColorStop(0.3, hexToRgba(this.color, 0.3));
                 gradient.addColorStop(1, 'rgba(0,0,0,0)');
 
                 uCtx.globalAlpha = alpha;
                 uCtx.fillStyle = gradient;
                 uCtx.beginPath();
-                uCtx.arc(x, y, s * 3, 0, Math.PI * 2);
+                uCtx.arc(x, y, s * 3.5, 0, Math.PI * 2);
                 uCtx.fill();
 
                 // Core
@@ -1104,14 +1109,14 @@
                 uCtx.arc(x, y, Math.max(0.8, s), 0, Math.PI * 2);
                 uCtx.fill();
 
-                // Warp streaks
-                if (warpSpeed > 12) {
-                    const streakLen = Math.min(warpSpeed * 2.5, 140);
-                    const dx = (x - W / 2) / 50;
-                    const dy = (y - H / 2) / 50;
-                    uCtx.globalAlpha = alpha * 0.5;
-                    uCtx.strokeStyle = hexToRgba(this.color, 0.6);
-                    uCtx.lineWidth = s * 0.6;
+                // Warp streaks during high speed
+                if (warpSpeed > 15) {
+                    const streakLen = Math.min(warpSpeed * 3, 180);
+                    const dx = (x - W / 2) / 45;
+                    const dy = (y - H / 2) / 45;
+                    uCtx.globalAlpha = alpha * 0.6;
+                    uCtx.strokeStyle = hexToRgba(this.color, 0.7);
+                    uCtx.lineWidth = s * 0.7;
                     uCtx.beginPath();
                     uCtx.moveTo(x, y);
                     uCtx.lineTo(x - dx * streakLen, y - dy * streakLen);
@@ -1131,29 +1136,55 @@
             reset() {
                 this.x = Math.random() * W;
                 this.y = Math.random() * H;
-                this.r = Math.random() * 2.5 + 0.8;
-                this.vx = (Math.random() - 0.5) * 0.2;
-                this.vy = (Math.random() - 0.5) * 0.2;
-                this.opacity = Math.random() * 0.4 + 0.1;
-                this.pulseSpeed = Math.random() * 0.015 + 0.008;
+                this.z = Math.random() * 500 + 100;
+                this.r = Math.random() * 3 + 1;
+                this.baseSpeed = Math.random() * 0.3 + 0.1;
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.pulseSpeed = Math.random() * 0.02 + 0.01;
                 this.pulseOffset = Math.random() * Math.PI * 2;
-                const colors = ['0, 242, 255', '123, 44, 191', '255, 107, 157'];
+                const colors = ['0, 242, 255', '123, 44, 191', '255, 107, 157', '255, 215, 0'];
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0) this.x = W;
-                if (this.x > W) this.x = 0;
-                if (this.y < 0) this.y = H;
-                if (this.y > H) this.y = 0;
+            update(speed) {
+                // Move toward center (creating depth illusion)
+                const cx = W / 2;
+                const cy = H / 2;
+                const dx = this.x - cx;
+                const dy = this.y - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                // Expand outward as we "fly through"
+                const expandSpeed = (speed / 10) * this.baseSpeed;
+                this.x += (dx / dist) * expandSpeed;
+                this.y += (dy / dist) * expandSpeed;
+                
+                // Respawn when out of bounds
+                if (this.x < -50 || this.x > W + 50 || this.y < -50 || this.y > H + 50) {
+                    // Respawn near center
+                    const angle = Math.random() * Math.PI * 2;
+                    const spawnDist = Math.random() * 50 + 10;
+                    this.x = cx + Math.cos(angle) * spawnDist;
+                    this.y = cy + Math.sin(angle) * spawnDist;
+                }
             }
 
             draw(time) {
                 const pulse = Math.sin(time * this.pulseSpeed + this.pulseOffset) * 0.3 + 0.7;
                 pCtx.globalAlpha = this.opacity * pulse;
-                pCtx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+                
+                // Glow effect
+                const glow = pCtx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r * 3);
+                glow.addColorStop(0, `rgba(${this.color}, ${this.opacity})`);
+                glow.addColorStop(1, `rgba(${this.color}, 0)`);
+                
+                pCtx.fillStyle = glow;
+                pCtx.beginPath();
+                pCtx.arc(this.x, this.y, this.r * 3 * pulse, 0, Math.PI * 2);
+                pCtx.fill();
+                
+                // Core
+                pCtx.fillStyle = `rgba(${this.color}, ${this.opacity + 0.3})`;
                 pCtx.beginPath();
                 pCtx.arc(this.x, this.y, this.r * pulse, 0, Math.PI * 2);
                 pCtx.fill();
@@ -1163,13 +1194,14 @@
         let stars = [];
         let dust = [];
         let warpSpeed = 0;
-        let targetSpeed = 1.5;
+        let targetSpeed = 4; // INCREASED BASE SPEED for constant motion
         let time = 0;
+        let nebulaOffset = 0;
 
         function initScene() {
-            const starCount = clamp(Math.floor((W * H) / 2000), 500, 1000);
+            const starCount = clamp(Math.floor((W * H) / 1800), 600, 1200);
             stars = Array.from({ length: starCount }, () => new Star(true));
-            dust = Array.from({ length: 50 }, () => new Dust());
+            dust = Array.from({ length: 80 }, () => new Dust());
 
             uCtx.fillStyle = 'rgba(3, 3, 5, 1)';
             uCtx.fillRect(0, 0, W, H);
@@ -1178,25 +1210,39 @@
         function drawNebula() {
             nCtx.clearRect(0, 0, W, H);
 
+            // Animated nebula positions
+            const wave = Math.sin(nebulaOffset * 0.5) * 30;
+            const wave2 = Math.cos(nebulaOffset * 0.3) * 20;
+
             // Purple nebula
-            const g1 = nCtx.createRadialGradient(W * 0.2, H * 0.8, 0, W * 0.2, H * 0.8, W * 0.55);
-            g1.addColorStop(0, 'rgba(123, 44, 191, 0.18)');
-            g1.addColorStop(0.5, 'rgba(123, 44, 191, 0.06)');
+            const g1 = nCtx.createRadialGradient(
+                W * 0.2 + wave, H * 0.8 + wave2, 0, 
+                W * 0.2 + wave, H * 0.8 + wave2, W * 0.55
+            );
+            g1.addColorStop(0, 'rgba(123, 44, 191, 0.2)');
+            g1.addColorStop(0.5, 'rgba(123, 44, 191, 0.08)');
             g1.addColorStop(1, 'transparent');
             nCtx.fillStyle = g1;
             nCtx.fillRect(0, 0, W, H);
 
             // Cyan nebula
-            const g2 = nCtx.createRadialGradient(W * 0.85, H * 0.2, 0, W * 0.85, H * 0.2, W * 0.45);
-            g2.addColorStop(0, 'rgba(0, 242, 255, 0.12)');
-            g2.addColorStop(0.5, 'rgba(0, 150, 255, 0.04)');
+            const g2 = nCtx.createRadialGradient(
+                W * 0.85 - wave, H * 0.2 - wave2, 0, 
+                W * 0.85 - wave, H * 0.2 - wave2, W * 0.5
+            );
+            g2.addColorStop(0, 'rgba(0, 242, 255, 0.15)');
+            g2.addColorStop(0.5, 'rgba(0, 150, 255, 0.05)');
             g2.addColorStop(1, 'transparent');
             nCtx.fillStyle = g2;
             nCtx.fillRect(0, 0, W, H);
 
-            // Pink nebula
-            const g3 = nCtx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, W * 0.6);
-            g3.addColorStop(0, 'rgba(255, 107, 157, 0.08)');
+            // Pink nebula (center, pulsing)
+            const pulseSize = W * 0.55 + Math.sin(nebulaOffset * 0.8) * W * 0.05;
+            const g3 = nCtx.createRadialGradient(
+                W * 0.5 + wave2, H * 0.5 - wave, 0, 
+                W * 0.5 + wave2, H * 0.5 - wave, pulseSize
+            );
+            g3.addColorStop(0, 'rgba(255, 107, 157, 0.1)');
             g3.addColorStop(1, 'transparent');
             nCtx.fillStyle = g3;
             nCtx.fillRect(0, 0, W, H);
@@ -1204,41 +1250,55 @@
 
         function drawWarpTunnel() {
             wCtx.clearRect(0, 0, W, H);
-            if (warpSpeed < 8) return;
+            if (warpSpeed < 10) return;
 
             const cx = W / 2, cy = H / 2;
-            const intensity = clamp((warpSpeed - 8) / 70, 0, 1);
+            const intensity = clamp((warpSpeed - 10) / 60, 0, 1);
 
             // Central bloom
-            const core = wCtx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.5);
-            core.addColorStop(0, `rgba(0, 242, 255, ${0.15 * intensity})`);
-            core.addColorStop(0.3, `rgba(123, 44, 191, ${0.1 * intensity})`);
-            core.addColorStop(0.6, `rgba(255, 107, 157, ${0.06 * intensity})`);
+            const core = wCtx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.55);
+            core.addColorStop(0, `rgba(255, 255, 255, ${0.1 * intensity})`);
+            core.addColorStop(0.15, `rgba(0, 242, 255, ${0.15 * intensity})`);
+            core.addColorStop(0.35, `rgba(123, 44, 191, ${0.12 * intensity})`);
+            core.addColorStop(0.6, `rgba(255, 107, 157, ${0.08 * intensity})`);
             core.addColorStop(1, 'transparent');
             wCtx.fillStyle = core;
             wCtx.fillRect(0, 0, W, H);
 
-            // Rings
-            for (let i = 0; i < 20; i++) {
-                const r = (i / 20) * Math.min(W, H) * 0.55 + Math.sin((time + i * 20) * 0.025) * 8;
-                wCtx.globalAlpha = (0.02 + i * 0.002) * intensity;
-                wCtx.strokeStyle = i % 3 === 0 ? 'rgba(0,242,255,0.6)' : (i % 3 === 1 ? 'rgba(123,44,191,0.6)' : 'rgba(255,107,157,0.6)');
-                wCtx.lineWidth = 1;
+            // Animated rings
+            for (let i = 0; i < 25; i++) {
+                const baseR = (i / 25) * Math.min(W, H) * 0.6;
+                const r = baseR + Math.sin((time + i * 15) * 0.03) * 10;
+                wCtx.globalAlpha = (0.015 + i * 0.003) * intensity;
+                wCtx.strokeStyle = i % 4 === 0 ? 'rgba(0,242,255,0.7)' : 
+                                   i % 4 === 1 ? 'rgba(123,44,191,0.7)' : 
+                                   i % 4 === 2 ? 'rgba(255,107,157,0.7)' : 
+                                   'rgba(255,255,255,0.5)';
+                wCtx.lineWidth = 1 + intensity;
                 wCtx.beginPath();
                 wCtx.arc(cx, cy, r, 0, Math.PI * 2);
                 wCtx.stroke();
             }
 
-            // Radial lines
-            wCtx.globalAlpha = 0.08 * intensity;
-            for (let i = 0; i < 60; i++) {
-                const angle = (i / 60) * Math.PI * 2 + time * 0.0015;
-                const len = Math.min(W, H) * (0.2 + intensity * 0.25);
-                const x1 = cx + Math.cos(angle) * len * 0.4;
-                const y1 = cy + Math.sin(angle) * len * 0.4;
-                const x2 = cx + Math.cos(angle) * len;
-                const y2 = cy + Math.sin(angle) * len;
-                wCtx.strokeStyle = i % 2 ? 'rgba(0,242,255,0.8)' : 'rgba(255,255,255,0.5)';
+            // Radial speed lines
+            const numLines = 72;
+            wCtx.globalAlpha = 0.1 * intensity;
+            for (let i = 0; i < numLines; i++) {
+                const angle = (i / numLines) * Math.PI * 2 + time * 0.002;
+                const innerLen = Math.min(W, H) * 0.1;
+                const outerLen = Math.min(W, H) * (0.3 + intensity * 0.25);
+                const x1 = cx + Math.cos(angle) * innerLen;
+                const y1 = cy + Math.sin(angle) * innerLen;
+                const x2 = cx + Math.cos(angle) * outerLen;
+                const y2 = cy + Math.sin(angle) * outerLen;
+                
+                const lineGrad = wCtx.createLinearGradient(x1, y1, x2, y2);
+                lineGrad.addColorStop(0, 'rgba(255,255,255,0)');
+                lineGrad.addColorStop(0.5, i % 2 ? 'rgba(0,242,255,0.8)' : 'rgba(255,255,255,0.6)');
+                lineGrad.addColorStop(1, 'rgba(255,255,255,0)');
+                
+                wCtx.strokeStyle = lineGrad;
+                wCtx.lineWidth = 1.5;
                 wCtx.beginPath();
                 wCtx.moveTo(x1, y1);
                 wCtx.lineTo(x2, y2);
@@ -1249,26 +1309,32 @@
 
         function animate() {
             time++;
+            nebulaOffset += 0.008; // Slow nebula animation
 
-            // Trail effect
-            const trail = warpSpeed > 12 ? 0.08 : 0.15;
+            // Trail effect - faster clear during warp
+            const trail = warpSpeed > 15 ? 0.06 : 0.12;
             uCtx.fillStyle = `rgba(3, 3, 5, ${trail})`;
             uCtx.fillRect(0, 0, W, H);
 
-            // Ease warp speed
-            warpSpeed += (targetSpeed - warpSpeed) * 0.025;
+            // Smooth speed easing
+            warpSpeed += (targetSpeed - warpSpeed) * 0.03;
 
             // Update and draw stars
             for (const star of stars) {
                 star.update(warpSpeed);
-                star.draw();
+                star.draw(time);
             }
 
-            // Update and draw dust
+            // Update and draw dust particles
             pCtx.clearRect(0, 0, W, H);
             for (const d of dust) {
-                d.update();
+                d.update(warpSpeed);
                 d.draw(time);
+            }
+
+            // Animate nebula
+            if (time % 3 === 0) { // Update nebula every 3 frames for performance
+                drawNebula();
             }
 
             // Warp tunnel
@@ -1304,16 +1370,18 @@
 
             document.body.classList.add('entered');
 
-            // Warp effect
+            // INTENSE WARP EFFECT
             warpTunnel.classList.add('active');
-            warpSpeed = 90;
-            targetSpeed = 90;
+            warpSpeed = 100;
+            targetSpeed = 100;
 
-            setTimeout(() => { targetSpeed = 25; }, 1200);
+            // Gradual slowdown for "arrival" feel
+            setTimeout(() => { targetSpeed = 40; }, 1000);
+            setTimeout(() => { targetSpeed = 15; }, 2000);
             setTimeout(() => { 
-                targetSpeed = 1.5; 
+                targetSpeed = 4; // Return to base cruising speed
                 warpTunnel.classList.remove('active');
-            }, 2800);
+            }, 3200);
 
             // UI transition
             entryScreen.classList.add('hidden');
@@ -1336,7 +1404,7 @@
         class TextScramble {
             constructor(el) {
                 this.el = el;
-                this.chars = '!<>-_\\/[]{}—=+*^?#✦✧★☆◆◇';
+                this.chars = '!<>-_\\/[]{}—=+*^?#✦✧★☆◆◇∞⊕⊗';
                 this.update = this.update.bind(this);
                 this.queue = [];
                 this.frame = 0;
@@ -1410,7 +1478,7 @@
         const enableAudioBtn = document.getElementById('enable-audio-btn');
 
         // Create visualizer bars
-        const barCount = 38;
+        const barCount = 40;
         const bars = [];
         for (let i = 0; i < barCount; i++) {
             const bar = document.createElement('div');
@@ -1448,9 +1516,9 @@
 
             for (let i = 0; i < bars.length; i++) {
                 const value = dataArray[i % len] / 255;
-                const height = 4 + value * 65;
+                const height = 4 + value * 68;
                 bars[i].style.height = height + 'px';
-                bars[i].style.opacity = (0.5 + value * 0.5).toFixed(2);
+                bars[i].style.opacity = (0.45 + value * 0.55).toFixed(2);
             }
 
             requestAnimationFrame(renderVisualizer);
@@ -1483,15 +1551,16 @@
             }
         });
 
+        // WARP BUTTON - Manual boost
         warpBtn.addEventListener('click', () => {
             const prev = targetSpeed;
-            targetSpeed = 65;
+            targetSpeed = 70;
             warpTunnel.classList.add('active');
-            setTimeout(() => { targetSpeed = 20; }, 800);
+            setTimeout(() => { targetSpeed = 25; }, 700);
             setTimeout(() => { 
                 targetSpeed = prev; 
                 warpTunnel.classList.remove('active');
-            }, 1800);
+            }, 1600);
         });
 
         /* ========================================
@@ -1529,7 +1598,7 @@
            HOLOGRAM CARD TILT
         ======================================== */
         const hologramCards = document.querySelectorAll('.hologram-card');
-        const maxTilt = 12;
+        const maxTilt = 15;
 
         hologramCards.forEach(card => {
             card.addEventListener('pointermove', (e) => {
@@ -1552,6 +1621,7 @@
            SCROLL EFFECTS
         ======================================== */
         const scrollProgress = document.getElementById('scroll-progress');
+        let lastScrollY = 0;
 
         window.addEventListener('scroll', () => {
             const scrollTop = window.scrollY;
@@ -1560,9 +1630,21 @@
 
             scrollProgress.style.transform = `scaleX(${clamp(scrollPercent, 0, 1)})`;
 
-            // Parallax
-            nebulaCanvas.style.transform = `translateY(${scrollTop * 0.08}px)`;
+            // Parallax on nebula
+            nebulaCanvas.style.transform = `translateY(${scrollTop * 0.06}px)`;
             particlesCanvas.style.transform = `translateY(${scrollTop * 0.03}px)`;
+
+            // Speed boost on scroll
+            const scrollDelta = Math.abs(scrollTop - lastScrollY);
+            lastScrollY = scrollTop;
+            
+            if (scrollDelta > 5) {
+                targetSpeed = clamp(4 + scrollDelta * 0.15, 4, 12);
+                clearTimeout(window.__scrollSpeedReset);
+                window.__scrollSpeedReset = setTimeout(() => {
+                    targetSpeed = 4; // Return to base cruising speed
+                }, 150);
+            }
         }, { passive: true });
 
         /* ========================================
