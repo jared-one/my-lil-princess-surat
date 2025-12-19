@@ -1,1503 +1,1583 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>For Princess Surat | Happy Birthday</title>
-
-  <meta name="description" content="A cosmic birthday experience for Princess Surat." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Dancing+Script:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --space-black: #050505;
-      --nebula-blue: #0a1a2f;
-      --starlight: #e2e2ff;
-      --cosmic-purple: #7b2cbf;
-      --gravity-cyan: #00f2ff;
-      --gold-accent: #ffd700;
-      --nebula-pink: #ff6b9d;
-      --deep-violet: #4a0080;
-
-      --panel: rgba(255,255,255,0.045);
-      --panel-strong: rgba(255,255,255,0.07);
-      --border: rgba(255,255,255,0.10);
-      --border-cyan: rgba(0,242,255,0.18);
-      --shadow: rgba(0,0,0,0.55);
-
-      --readable: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.70);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body { height: 100%; }
-
-    body {
-      background: var(--space-black);
-      color: var(--starlight);
-      font-family: 'Cinzel', 'Georgia', serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-    }
-
-    /* Enable custom cursor only when it makes sense */
-    @media (pointer: fine) {
-      body.entered { cursor: none; }
-    }
-
-    a, button { color: inherit; }
-
-    /* --- Custom Cursor --- */
-    .cursor-dot,
-    .cursor-outline {
-      position: fixed;
-      top: 0;
-      left: 0;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      z-index: 9999;
-      pointer-events: none;
-      display: none;
-    }
-
-    @media (pointer: fine) {
-      body.entered .cursor-dot,
-      body.entered .cursor-outline {
-        display: block;
-      }
-    }
-
-    .cursor-dot {
-      width: 6px;
-      height: 6px;
-      background: radial-gradient(circle, #fff, var(--gravity-cyan));
-      box-shadow: 0 0 10px var(--gravity-cyan), 0 0 20px var(--gravity-cyan);
-    }
-
-    .cursor-outline {
-      width: 34px;
-      height: 34px;
-      border: 1px solid rgba(0, 242, 255, 0.5);
-      box-shadow: 0 0 18px rgba(0, 242, 255, 0.22);
-      transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
-      background: rgba(0, 242, 255, 0.02);
-      backdrop-filter: blur(6px);
-    }
-
-    .cursor-outline.hovering {
-      width: 54px;
-      height: 54px;
-      background: rgba(0, 242, 255, 0.08);
-      border-color: rgba(0, 242, 255, 0.85);
-    }
-
-    /* --- Background Canvases --- */
-    #universe, #nebula-layer, #particles-layer, #tunnel-layer {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-    #universe { z-index: -5; }
-    #nebula-layer { z-index: -4; opacity: 0.7; }
-    #particles-layer { z-index: -3; opacity: 1; }
-    #tunnel-layer { z-index: -2; opacity: 0.9; mix-blend-mode: screen; }
-
-    /* --- Grain + Vignette for depth --- */
-    .vignette {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.75) 100%);
-    }
-
-    .grain {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      opacity: 0.07;
-      background:
-        repeating-linear-gradient(0deg, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 6px),
-        repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.0) 3px, rgba(255,255,255,0.0) 7px);
-      filter: blur(0.4px);
-      animation: grainShift 7s ease-in-out infinite;
-    }
-
-    @keyframes grainShift {
-      0%, 100% { transform: translate3d(0,0,0); opacity: 0.065; }
-      50% { transform: translate3d(6px,-8px,0); opacity: 0.085; }
-    }
-
-    /* --- Scroll Progress --- */
-    .scroll-progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 2px;
-      width: 100%;
-      background: linear-gradient(90deg, var(--gravity-cyan), var(--cosmic-purple));
-      z-index: 9999;
-      transform-origin: left;
-      transform: scaleX(0);
-      box-shadow: 0 0 10px var(--gravity-cyan);
-    }
-
-    /* --- Typography & Motion --- */
-    h1, h2, h3 {
-      font-weight: 300;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-    }
-
-    .fade-in-up {
-      opacity: 0;
-      transform: translateY(34px);
-      transition: opacity 1.4s cubic-bezier(0.19, 1, 0.22, 1), transform 1.4s cubic-bezier(0.19, 1, 0.22, 1);
-      will-change: opacity, transform;
-    }
-
-    .fade-in-up.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* --- Entry Overlay --- */
-    #entry-screen {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(ellipse at center, #0a0a18 0%, #000 70%, #000 100%);
-      z-index: 1000;
-      display: grid;
-      place-items: center;
-      transition: opacity 1.6s ease, visibility 1.6s, transform 1.6s ease;
-      overflow: hidden;
-    }
-
-    #entry-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transform: scale(1.4);
-    }
-
-    .entry-core {
-      position: relative;
-      width: min(720px, 92vw);
-      padding: 54px 26px;
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.65);
-      text-align: center;
-      backdrop-filter: blur(18px);
-    }
-
-    .entry-portal {
-      position: absolute;
-      inset: -40%;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 50%,
-          rgba(0, 242, 255, 0.18) 0%,
-          rgba(123, 44, 191, 0.11) 30%,
-          rgba(255, 107, 157, 0.08) 50%,
-          transparent 70%);
-      filter: blur(0.2px);
-      animation: portalPulse 3.2s ease-in-out infinite;
-      transform-origin: center;
-      pointer-events: none;
-    }
-
-    @keyframes portalPulse {
-      0%, 100% { transform: scale(1); opacity: 0.65; }
-      50% { transform: scale(1.08); opacity: 0.95; }
-    }
-
-    .entry-rings {
-      position: absolute;
-      inset: -55%;
-      border-radius: 50%;
-      border: 1px solid rgba(0, 242, 255, 0.18);
-      animation: ringRotate 24s linear infinite;
-      pointer-events: none;
-    }
-
-    .entry-rings::before,
-    .entry-rings::after {
-      content: '';
-      position: absolute;
-      inset: 9%;
-      border-radius: 50%;
-      border: 1px solid rgba(123, 44, 191, 0.18);
-    }
-    .entry-rings::before { animation: ringRotate 18s linear infinite reverse; }
-    .entry-rings::after {
-      inset: 18%;
-      border-color: rgba(255, 215, 0, 0.14);
-      animation: ringRotate 12s linear infinite;
-    }
-
-    @keyframes ringRotate { 100% { transform: rotate(360deg); } }
-
-    .glitch-text {
-      font-size: clamp(1.9rem, 5.6vw, 3.6rem);
-      margin-bottom: 14px;
-      background: linear-gradient(135deg, #ffffff 0%, #bdbdff 40%, var(--gravity-cyan) 100%);
-      -webkit-background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 70px rgba(0, 242, 255, 0.24);
-      line-height: 1.1;
-    }
-
-    .subtitle {
-      color: var(--gravity-cyan);
-      font-size: 0.82rem;
-      letter-spacing: 0.45em;
-      opacity: 0.9;
-      text-shadow: 0 0 20px rgba(0, 242, 255, 0.45);
-      margin-top: 8px;
-    }
-
-    .entry-hint {
-      margin-top: 18px;
-      color: rgba(255,255,255,0.7);
-      font-family: 'Orbitron', system-ui, sans-serif;
-      font-size: 0.78rem;
-      letter-spacing: 0.18em;
-      opacity: 0.9;
-    }
-
-    .entry-btn {
-      margin-top: 28px;
-      padding: 18px 52px;
-      border-radius: 999px;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.30);
-      color: white;
-      font-family: 'Orbitron', system-ui, sans-serif;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      font-size: 0.82rem;
-      transition: all 0.45s cubic-bezier(0.19, 1, 0.22, 1);
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .entry-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -110%;
-      width: 120%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.26), transparent);
-      transition: 0.5s;
-    }
-
-    .entry-btn:hover {
-      border-color: var(--gravity-cyan);
-      text-shadow: 0 0 22px var(--gravity-cyan);
-      box-shadow: 0 0 70px rgba(0, 242, 255, 0.22), inset 0 0 34px rgba(0, 242, 255, 0.10);
-      transform: translateY(-1px) scale(1.03);
-    }
-    .entry-btn:hover::before { left: 110%; }
-
-    /* --- Audio toast fallback --- */
-    .audio-toast {
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      z-index: 1100;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: rgba(10, 10, 20, 0.72);
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(16px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.55);
-      display: none;
-      gap: 10px;
-      align-items: center;
-      max-width: min(560px, 92vw);
-      color: rgba(255,255,255,0.88);
-      font-family: 'Orbitron', system-ui, sans-serif;
-      letter-spacing: 0.06em;
-      font-size: 0.78rem;
-    }
-    .audio-toast.show { display: flex; }
-
-    .audio-toast button {
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(0,242,255,0.35);
-      background: rgba(0,242,255,0.06);
-      color: white;
-      cursor: pointer;
-      transition: 0.25s ease;
-    }
-    .audio-toast button:hover {
-      background: rgba(0,242,255,0.12);
-      border-color: rgba(0,242,255,0.65);
-      box-shadow: 0 0 22px rgba(0,242,255,0.18);
-    }
-
-    /* --- Main Content --- */
-    main.content-wrapper {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 110px 22px 80px;
-      opacity: 0;
-      transition: opacity 1.8s ease;
-    }
-    main.content-wrapper.visible { opacity: 1; }
-
-    .title-section {
-      text-align: center;
-      margin-bottom: 70px;
-      position: relative;
-    }
-
-    .main-title h1 {
-      font-size: clamp(1.7rem, 4.8vw, 3rem);
-      margin-bottom: 8px;
-    }
-
-    .highlight {
-      background: linear-gradient(135deg, var(--gravity-cyan), var(--cosmic-purple), var(--nebula-pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 18px rgba(0, 242, 255, 0.15);
-    }
-
-    /* --- Music Player --- */
-    .music-player {
-      background: var(--panel);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      border-radius: 24px;
-      padding: 22px;
-      margin: 0 auto 60px;
-      max-width: 460px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: 0 18px 44px rgba(0,0,0,0.55), inset 0 0 40px rgba(0, 242, 255, 0.03);
-    }
-
-    .track-info { text-align: center; margin-bottom: 14px; }
-
-    .track-name {
-      display: block;
-      color: white;
-      font-size: 1.05rem;
-      margin-bottom: 6px;
-      text-shadow: 0 0 10px rgba(255,255,255,0.25);
-    }
-    .track-artist {
-      color: rgba(255,255,255,0.55);
-      font-size: 0.78rem;
-      font-style: italic;
-    }
-
-    #visualizer {
-      width: 100%;
-      height: 74px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 3px;
-      padding-bottom: 4px;
-    }
-
-    .bar {
-      width: 4px;
-      background: linear-gradient(to top, var(--deep-violet), var(--cosmic-purple), var(--gravity-cyan));
-      border-radius: 3px;
-      height: 3px;
-      transition: height 0.05s linear;
-      filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.18));
-      opacity: 0.75;
-    }
-
-    .music-actions {
-      margin-top: 14px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .pill {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.12);
-      cursor: pointer;
-      font-family: 'Orbitron', system-ui, sans-serif;
-      font-size: 0.74rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      transition: 0.25s ease;
-    }
-    .pill:hover {
-      border-color: rgba(0,242,255,0.35);
-      box-shadow: 0 0 18px rgba(0,242,255,0.14);
-      transform: translateY(-1px);
-    }
-
-    /* --- Cosmic Artifacts Grid --- */
-    .memories-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 26px;
-      margin: 60px 0 24px;
-    }
-
-    .hologram-card {
-      height: 320px;
-      background: linear-gradient(135deg, rgba(10, 10, 30, 0.58), rgba(20, 10, 44, 0.36));
-      border: 1px solid var(--border-cyan);
-      border-radius: 16px;
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-      transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.15s ease;
-      will-change: transform;
-      isolation: isolate;
-    }
-
-    .hologram-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent, rgba(0, 242, 255, 0.085), transparent);
-      transform: translateY(-100%);
-      animation: scanline 4s linear infinite;
-      opacity: 0.85;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .hologram-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 50% 30%, rgba(255,255,255,0.06), transparent 50%),
-        radial-gradient(circle at 50% 60%, transparent 0%, rgba(0,0,0,0.45) 100%);
-      pointer-events: none;
-    }
-
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
-    }
-
-    .hologram-card:hover {
-      border-color: rgba(0, 242, 255, 0.75);
-      box-shadow: 0 22px 55px rgba(0, 242, 255, 0.18), inset 0 0 50px rgba(0, 242, 255, 0.05);
-    }
-
-    .artifact {
-      width: min(220px, 70%);
-      height: auto;
-      filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.35)) drop-shadow(0 0 34px rgba(123, 44, 191, 0.20));
-      z-index: 1;
-    }
-
-    .hologram-label {
-      position: absolute;
-      bottom: 18px;
-      font-size: 0.76rem;
-      color: var(--gravity-cyan);
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      text-shadow: 0 0 12px rgba(0, 242, 255, 0.55);
-      z-index: 2;
-      opacity: 0.95;
-    }
-
-    /* --- Letter / Poem --- */
-    .letter-container {
-      margin-top: 40px;
-      background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.075));
-      border: 1px solid rgba(255,255,255,0.10);
-      border-left: 2px solid var(--cosmic-purple);
-      padding: clamp(26px, 4.3vw, 54px);
-      position: relative;
-      border-radius: 0 16px 16px 0;
-      box-shadow: 0 0 55px rgba(123, 44, 191, 0.12), inset 0 0 90px rgba(0, 0, 0, 0.32);
-      overflow: hidden;
-    }
-
-    .letter-container::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(180deg, var(--gravity-cyan), var(--cosmic-purple), var(--nebula-pink));
-      box-shadow: 0 0 18px rgba(123, 44, 191, 0.45);
-    }
-
-    .letter-container::after {
-      /* constellation-like subtle texture */
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 12% 30%, rgba(255,255,255,0.14) 0 1px, transparent 2px),
-        radial-gradient(circle at 80% 20%, rgba(0,242,255,0.20) 0 1px, transparent 2px),
-        radial-gradient(circle at 65% 68%, rgba(255,107,157,0.18) 0 1px, transparent 2px),
-        radial-gradient(circle at 28% 80%, rgba(255,215,0,0.16) 0 1px, transparent 2px),
-        radial-gradient(circle at 50% 45%, rgba(255,255,255,0.10) 0 1px, transparent 2px);
-      opacity: 0.35;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .letter-container p {
-      position: relative;
-      z-index: 1;
-      margin-bottom: 18px;
-      line-height: 1.9;
-      font-size: clamp(1rem, 1.9vw, 1.12rem);
-      color: var(--readable);
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-
-    .letter-container p:last-child { margin-bottom: 0; }
-
-    .signature {
-      text-align: center;
-      margin-top: 90px;
-      padding-bottom: 40px;
-      font-family: 'Dancing Script', cursive;
-      font-size: clamp(1.9rem, 4.2vw, 2.5rem);
-      background: linear-gradient(45deg, var(--gravity-cyan), var(--cosmic-purple), var(--nebula-pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 18px rgba(0, 242, 255, 0.22));
-      opacity: 0.98;
-    }
-
-    /* --- Shooting Stars --- */
-    .shooting-star {
-      position: fixed;
-      width: 120px;
-      height: 2px;
-      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,1));
-      border-radius: 50%;
-      animation: shootingStar 3.6s linear infinite;
-      opacity: 0;
-      z-index: -1;
-      pointer-events: none;
-      filter: drop-shadow(0 0 10px rgba(0,242,255,0.18));
-    }
-
-    @keyframes shootingStar {
-      0% { transform: translateX(-140px) translateY(0); opacity: 0; }
-      6% { opacity: 1; }
-      26% { opacity: 0; }
-      100% { transform: translateX(110vw) translateY(360px); opacity: 0; }
-    }
-
-    /* --- Reduced Motion --- */
-    @media (prefers-reduced-motion: reduce) {
-      .entry-portal, .entry-rings, .shooting-star, .grain { animation: none !important; }
-      .hologram-card::before { animation: none !important; }
-      #tunnel-layer { display: none; }
-    }
-
-    /* --- Mobile --- */
-    @media (max-width: 768px) {
-      main.content-wrapper { padding-top: 96px; }
-      .subtitle { letter-spacing: 0.28em; }
-    }
-  </style>
-</head>
-
-<body>
-  <!-- Custom Cursor -->
-  <div class="cursor-dot" data-cursor-dot></div>
-  <div class="cursor-outline" data-cursor-outline></div>
-
-  <!-- Scroll Progress -->
-  <div class="scroll-progress" id="scroll-progress"></div>
-
-  <!-- Background Layers -->
-  <canvas id="universe"></canvas>
-  <canvas id="nebula-layer"></canvas>
-  <canvas id="particles-layer"></canvas>
-  <canvas id="tunnel-layer"></canvas>
-  <div class="vignette"></div>
-  <div class="grain"></div>
-
-  <!-- Shooting Stars -->
-  <div class="shooting-star" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
-  <div class="shooting-star" style="top: 28%; left: 60%; animation-delay: 3.8s;"></div>
-  <div class="shooting-star" style="top: 52%; left: 15%; animation-delay: 7.6s;"></div>
-
-  <!-- Entry Overlay -->
-  <section id="entry-screen" aria-label="Entry screen">
-    <div class="entry-portal" aria-hidden="true"></div>
-    <div class="entry-rings" aria-hidden="true"></div>
-
-    <div class="entry-core">
-      <h2 class="subtitle">A BIRTHDAY WRITTEN IN STARDUST</h2>
-      <h1 class="glitch-text" id="entry-title" data-text="HAPPY BIRTHDAY, PRINCESS">HAPPY BIRTHDAY, PRINCESS</h1>
-      <div class="entry-hint">Press Enter or click to dive in. Sound will try to start with your gesture.</div>
-      <button class="entry-btn" id="start-btn" type="button">Dive into Her Cosmos</button>
-    </div>
-  </section>
-
-  <!-- Audio Toast Fallback -->
-  <div class="audio-toast" id="audio-toast" role="status" aria-live="polite">
-    <div style="flex: 1;">
-      Sound is paused by your browser. Tap “Enable Sound” to continue the dive.
-    </div>
-    <button id="enable-sound" type="button">Enable Sound</button>
-  </div>
-
-  <!-- Main Content -->
-  <main class="content-wrapper" id="main-content">
-    <header class="title-section fade-in-up">
-      <h1>To <span class="highlight">Princess Surat</span></h1>
-      <p class="subtitle">HAPPY BIRTHDAY • ANOTHER ORBIT, STILL UNREAL</p>
-    </header>
-
-    <!-- Audio Player -->
-    <section class="music-player fade-in-up" aria-label="Music player">
-      <div class="track-info">
-        <span class="track-name">Pisces</span>
-        <span class="track-artist">Tony Ann (Slowed &amp; Reverb)</span>
-      </div>
-
-      <div id="visualizer" aria-hidden="true"></div>
-
-      <!-- Keep the path EXACTLY the same -->
-      <audio id="bg-music" loop preload="auto" crossorigin="anonymous">
-        <source src="Pisces - Tony Ann (Piano Cover).mp3" type="audio/mpeg">
-      </audio>
-
-      <div class="music-actions">
-        <button class="pill" id="toggle-music" type="button">Pause</button>
-        <button class="pill" id="boost-warp" type="button">Warp</button>
-      </div>
-    </section>
-
-    <!-- Cosmic Artifacts (SVG-only) -->
-    <section class="memories-grid fade-in-up" aria-label="Cosmic artifacts">
-      <!-- Artifact 1: Crown Nebula -->
-      <article class="hologram-card" tabindex="0" aria-label="Crown Nebula">
-        <svg class="artifact" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A glowing cosmic crown">
-          <defs>
-            <linearGradient id="crownG" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00f2ff" stop-opacity="0.95">
-                <animate attributeName="stop-color" values="#00f2ff;#7b2cbf;#ff6b9d;#00f2ff" dur="6s" repeatCount="indefinite"/>
-              </stop>
-              <stop offset="100%" stop-color="#ffd700" stop-opacity="0.75">
-                <animate attributeName="stop-opacity" values="0.55;0.85;0.55" dur="4s" repeatCount="indefinite"/>
-              </stop>
-            </linearGradient>
-            <filter id="glowA" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3.5" result="b"/>
-              <feMerge>
-                <feMergeNode in="b"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-
-          <!-- aura -->
-          <circle cx="110" cy="110" r="92" fill="none" stroke="url(#crownG)" stroke-width="1" opacity="0.25">
-            <animate attributeName="r" values="88;96;88" dur="5s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.16;0.35;0.16" dur="5s" repeatCount="indefinite"/>
-          </circle>
-
-          <!-- crown -->
-          <g filter="url(#glowA)">
-            <path d="M45 130 L65 85 L95 115 L110 75 L125 115 L155 85 L175 130
-                     Q110 160 45 130 Z"
-                  fill="url(#crownG)" opacity="0.92"/>
-            <rect x="55" y="130" width="110" height="16" rx="8" fill="rgba(255,255,255,0.08)" stroke="rgba(0,242,255,0.35)"/>
-            <circle cx="65" cy="85" r="4" fill="#fff" opacity="0.9"/>
-            <circle cx="110" cy="75" r="5" fill="#ffd700" opacity="0.85"/>
-            <circle cx="155" cy="85" r="4" fill="#fff" opacity="0.9"/>
-          </g>
-
-          <!-- stardust -->
-          <g opacity="0.8">
-            <circle cx="40" cy="70" r="1.2" fill="#fff">
-              <animate attributeName="opacity" values="0.1;0.9;0.1" dur="2.8s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="182" cy="62" r="1.1" fill="#00f2ff">
-              <animate attributeName="opacity" values="0.2;1;0.2" dur="3.1s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="170" cy="170" r="1.1" fill="#ff6b9d">
-              <animate attributeName="opacity" values="0.2;0.95;0.2" dur="2.6s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="56" cy="168" r="1.0" fill="#fff">
-              <animate attributeName="opacity" values="0.15;0.8;0.15" dur="3.4s" repeatCount="indefinite"/>
-            </circle>
-          </g>
-        </svg>
-        <span class="hologram-label">Crown Nebula</span>
-      </article>
-
-      <!-- Artifact 2: Astral Compass -->
-      <article class="hologram-card" tabindex="0" aria-label="Astral Compass">
-        <svg class="artifact" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A glowing astral compass">
-          <defs>
-            <radialGradient id="compassCore" cx="50%" cy="50%" r="60%">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
-              <stop offset="45%" stop-color="#00f2ff" stop-opacity="0.28"/>
-              <stop offset="100%" stop-color="transparent"/>
-            </radialGradient>
-            <linearGradient id="compassG" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#7b2cbf" stop-opacity="0.8"/>
-              <stop offset="100%" stop-color="#00f2ff" stop-opacity="0.9"/>
-            </linearGradient>
-            <filter id="glowB" x="-60%" y="-60%" width="220%" height="220%">
-              <feGaussianBlur stdDeviation="3" result="b"/>
-              <feMerge>
-                <feMergeNode in="b"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-
-          <g filter="url(#glowB)">
-            <circle cx="110" cy="110" r="82" fill="rgba(255,255,255,0.03)" stroke="rgba(0,242,255,0.35)" stroke-width="1.2"/>
-            <circle cx="110" cy="110" r="58" fill="none" stroke="rgba(123,44,191,0.35)" stroke-width="1"/>
-            <circle cx="110" cy="110" r="88" fill="none" stroke="url(#compassG)" stroke-width="1" opacity="0.25"/>
-
-            <!-- ticks -->
-            <g stroke="rgba(255,255,255,0.35)" stroke-width="1">
-              <line x1="110" y1="22" x2="110" y2="36"/>
-              <line x1="110" y1="184" x2="110" y2="198"/>
-              <line x1="22" y1="110" x2="36" y2="110"/>
-              <line x1="184" y1="110" x2="198" y2="110"/>
-              <g opacity="0.7">
-                <line x1="55" y1="55" x2="65" y2="65"/>
-                <line x1="165" y1="55" x2="155" y2="65"/>
-                <line x1="55" y1="165" x2="65" y2="155"/>
-                <line x1="165" y1="165" x2="155" y2="155"/>
-              </g>
-            </g>
-
-            <!-- needle group rotates -->
-            <g>
-              <animateTransform attributeName="transform" type="rotate" from="0 110 110" to="360 110 110" dur="18s" repeatCount="indefinite"/>
-              <path d="M110 40 L122 110 L110 180 L98 110 Z" fill="url(#compassG)" opacity="0.78"/>
-              <circle cx="110" cy="110" r="8" fill="#fff" opacity="0.85"/>
-              <circle cx="110" cy="110" r="18" fill="url(#compassCore)" opacity="0.9"/>
-            </g>
-          </g>
-        </svg>
-        <span class="hologram-label">Astral Compass</span>
-      </article>
-
-      <!-- Artifact 3: Celestial Bloom -->
-      <article class="hologram-card" tabindex="0" aria-label="Celestial Bloom">
-        <svg class="artifact" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A celestial bloom with orbiting particles">
-          <defs>
-            <linearGradient id="bloomG" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00f2ff" stop-opacity="0.85"/>
-              <stop offset="55%" stop-color="#7b2cbf" stop-opacity="0.75"/>
-              <stop offset="100%" stop-color="#ff6b9d" stop-opacity="0.75"/>
-            </linearGradient>
-            <radialGradient id="bloomCore" cx="50%" cy="50%" r="60%">
-              <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-              <stop offset="55%" stop-color="#ffd700" stop-opacity="0.7"/>
-              <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-            </radialGradient>
-            <filter id="glowC" x="-60%" y="-60%" width="220%" height="220%">
-              <feGaussianBlur stdDeviation="3.2" result="b"/>
-              <feMerge>
-                <feMergeNode in="b"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-
-          <g filter="url(#glowC)">
-            <circle cx="110" cy="110" r="82" fill="none" stroke="rgba(0,242,255,0.22)" opacity="0.7"/>
-            <!-- petals -->
-            <g fill="url(#bloomG)" opacity="0.9">
-              <ellipse cx="110" cy="62" rx="16" ry="42">
-                <animate attributeName="ry" values="40;46;40" dur="3.2s" repeatCount="indefinite"/>
-              </ellipse>
-              <ellipse cx="110" cy="62" rx="16" ry="42" transform="rotate(60 110 110)"/>
-              <ellipse cx="110" cy="62" rx="16" ry="42" transform="rotate(120 110 110)"/>
-              <ellipse cx="110" cy="62" rx="16" ry="42" transform="rotate(180 110 110)"/>
-              <ellipse cx="110" cy="62" rx="16" ry="42" transform="rotate(240 110 110)"/>
-              <ellipse cx="110" cy="62" rx="16" ry="42" transform="rotate(300 110 110)"/>
-            </g>
-
-            <circle cx="110" cy="110" r="16" fill="url(#bloomCore)">
-              <animate attributeName="r" values="14;18;14" dur="2.2s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="110" cy="110" r="6" fill="#fff" opacity="0.9"/>
-
-            <!-- orbiting particles -->
-            <g>
-              <animateTransform attributeName="transform" type="rotate" from="0 110 110" to="360 110 110" dur="9s" repeatCount="indefinite"/>
-              <circle cx="110" cy="28" r="2" fill="#fff" opacity="0.85"/>
-              <circle cx="190" cy="110" r="1.6" fill="#00f2ff" opacity="0.75"/>
-              <circle cx="110" cy="192" r="2" fill="#ff6b9d" opacity="0.65"/>
-              <circle cx="30" cy="110" r="1.3" fill="#ffd700" opacity="0.75"/>
-            </g>
-          </g>
-        </svg>
-        <span class="hologram-label">Celestial Bloom</span>
-      </article>
-    </section>
-
-    <!-- The Birthday Letter / Poem -->
-    <section class="letter-container fade-in-up" aria-label="Birthday letter">
-      <p><strong>Princess Surat</strong>,</p>
-
-      <p>
-        Today isn’t just a date to me — it’s an event. A clean, bright mark in the calendar of the universe,
-        the kind of day that makes the dark look intentional, like it was built just to frame you.
-      </p>
-
-      <p>
-        Your beauty isn’t “pretty” in the casual way people throw that word around.
-        It’s gravitational. It changes how everything else behaves.
-        It makes attention bend. It makes silence feel like it’s holding its breath.
-        Like starlight deciding to stay a second longer before it fades.
-      </p>
-
-      <p>
-        I don’t need to borrow fake scenes to explain you.
-        I can speak from what’s consistent: the way you exist with precision —
-        picky, exact, and rightfully so — like a crown that refuses the wrong head.
-        And still… even with all that sharpness, you glow soft.
-        Not weak. Soft the way nebulae are soft: endless, patient, and impossible to ignore.
-      </p>
-
-      <p>
-        So here’s my birthday wish, written in my language:
-        May this year treat you like a constant, not a variable.
-        May the world stop trying to reduce you into something simpler.
-        May every room you walk into learn your name correctly —
-        not because it’s demanded, but because your presence makes it necessary.
-      </p>
-
-      <p>
-        Happy Birthday, <span class="highlight">Princess</span>.
-        If the cosmos is a cathedral, you’re the moment the lights turn on.
-      </p>
-
-      <p style="margin-top: 22px;">
-        Always, <br />
-        Dandy
-      </p>
-    </section>
-
-    <div class="signature fade-in-up">Dandy</div>
-  </main>
-
-  <script>
-    /***********************
-     * Utilities
-     ***********************/
-    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
-
-    function hexToRgba(hex, a) {
-      // Supports #rgb and #rrggbb
-      const h = hex.replace('#', '').trim();
-      let r, g, b;
-      if (h.length === 3) {
-        r = parseInt(h[0] + h[0], 16);
-        g = parseInt(h[1] + h[1], 16);
-        b = parseInt(h[2] + h[2], 16);
-      } else {
-        r = parseInt(h.slice(0, 2), 16);
-        g = parseInt(h.slice(2, 4), 16);
-        b = parseInt(h.slice(4, 6), 16);
-      }
-      return `rgba(${r}, ${g}, ${b}, ${a})`;
-    }
-
-    /***********************
-     * Canvases (DPI-aware)
-     ***********************/
-    const universe = document.getElementById('universe');
-    const uctx = universe.getContext('2d');
-
-    const nebula = document.getElementById('nebula-layer');
-    const nctx = nebula.getContext('2d');
-
-    const particles = document.getElementById('particles-layer');
-    const pctx = particles.getContext('2d');
-
-    const tunnel = document.getElementById('tunnel-layer');
-    const tctx = tunnel.getContext('2d');
-
-    let W = 0, H = 0, DPR = 1;
-
-    function resizeCanvases() {
-      DPR = clamp(window.devicePixelRatio || 1, 1, 2);
-
-      W = window.innerWidth;
-      H = window.innerHeight;
-
-      for (const c of [universe, nebula, particles, tunnel]) {
-        c.width = Math.floor(W * DPR);
-        c.height = Math.floor(H * DPR);
-        c.style.width = W + 'px';
-        c.style.height = H + 'px';
-      }
-
-      uctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      nctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      pctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      tctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-
-      buildScene();
-      drawNebula();
-    }
-
-    window.addEventListener('resize', resizeCanvases);
-
-    /***********************
-     * Starfield + Particles
-     ***********************/
-    let stars = [];
-    let dust = [];
-    let time = 0;
-
-    let warpSpeed = 0;
-    let targetSpeed = 1.6;
-
-    const STAR_COLORS = ['#ffffff', '#00f2ff', '#7b2cbf', '#ff6b9d', '#ffd700'];
-    const STAR_WEIGHTS = [0.58, 0.17, 0.11, 0.10, 0.04];
-
-    function weightedStarColor() {
-      const r = Math.random();
-      let s = 0;
-      for (let i = 0; i < STAR_WEIGHTS.length; i++) {
-        s += STAR_WEIGHTS[i];
-        if (r <= s) return STAR_COLORS[i];
-      }
-      return '#ffffff';
-    }
-
-    class Star {
-      constructor(initial = false) { this.reset(initial); }
-      reset(initial) {
-        this.x = (Math.random() - 0.5) * W * 2;
-        this.y = (Math.random() - 0.5) * H * 2;
-        this.z = initial ? Math.random() * 2000 : 2000;
-        this.size = Math.random() * 2.2 + 0.5;
-        this.brightness = Math.random() * 0.75 + 0.25;
-        this.color = weightedStarColor();
-      }
-      update(speed) {
-        this.z -= speed;
-        if (this.z <= 1) this.reset(false);
-      }
-      draw() {
-        const x = (this.x / this.z) * 640 + W / 2;
-        const y = (this.y / this.z) * 640 + H / 2;
-        const s = (1200 / this.z) * this.size;
-        const alpha = Math.min(1, (2000 - this.z) / 900) * this.brightness;
-
-        if (x < -60 || x > W + 60 || y < -60 || y > H + 60) return;
-
-        const glow = uctx.createRadialGradient(x, y, 0, x, y, s * 3.3);
-        glow.addColorStop(0, hexToRgba(this.color, 0.9));
-        glow.addColorStop(0.45, hexToRgba(this.color, 0.22));
-        glow.addColorStop(1, 'rgba(0,0,0,0)');
-
-        uctx.globalAlpha = alpha;
-        uctx.fillStyle = glow;
-        uctx.beginPath();
-        uctx.arc(x, y, s * 3.3, 0, Math.PI * 2);
-        uctx.fill();
-
-        uctx.fillStyle = this.color;
-        uctx.beginPath();
-        uctx.arc(x, y, Math.max(0.7, s), 0, Math.PI * 2);
-        uctx.fill();
-
-        // streaks during warp
-        if (warpSpeed > 10) {
-          const streak = Math.min(warpSpeed * 2.4, 120);
-          const dx = (x - W / 2) / 55;
-          const dy = (y - H / 2) / 55;
-          uctx.globalAlpha = alpha * 0.45;
-          uctx.strokeStyle = hexToRgba(this.color, 0.55);
-          uctx.lineWidth = Math.max(0.7, s * 0.6);
-          uctx.beginPath();
-          uctx.moveTo(x, y);
-          uctx.lineTo(x - dx * streak, y - dy * streak);
-          uctx.stroke();
-        }
-      }
-    }
-
-    class Dust {
-      constructor() { this.reset(); }
-      reset() {
-        this.x = Math.random() * W;
-        this.y = Math.random() * H;
-        this.r = Math.random() * 2.8 + 0.8;
-        this.vx = (Math.random() - 0.5) * 0.25;
-        this.vy = (Math.random() - 0.5) * 0.25;
-        this.o = Math.random() * 0.45 + 0.15;
-        this.w = Math.random() * 0.02 + 0.01;
-        this.ph = Math.random() * Math.PI * 2;
-        const c = ['rgba(0, 242, 255,', 'rgba(123, 44, 191,', 'rgba(255, 107, 157,'][Math.floor(Math.random() * 3)];
-        this.c = c;
-      }
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        if (this.x < 0) this.x = W;
-        if (this.x > W) this.x = 0;
-        if (this.y < 0) this.y = H;
-        if (this.y > H) this.y = 0;
-      }
-      draw(t) {
-        const pulse = Math.sin(t * this.w + this.ph) * 0.3 + 0.7;
-        pctx.globalAlpha = this.o * pulse;
-        pctx.fillStyle = this.c + this.o + ')';
-        pctx.beginPath();
-        pctx.arc(this.x, this.y, this.r * pulse, 0, Math.PI * 2);
-        pctx.fill();
-      }
-    }
-
-    function buildScene() {
-      const starCount = clamp(Math.floor((W * H) / 1800), 520, 980);
-      stars = Array.from({ length: starCount }, () => new Star(true));
-      dust = Array.from({ length: 60 }, () => new Dust());
-
-      // prime background
-      uctx.fillStyle = 'rgba(5,5,5,1)';
-      uctx.fillRect(0, 0, W, H);
-    }
-
-    function drawNebula() {
-      nctx.clearRect(0, 0, W, H);
-
-      const g1 = nctx.createRadialGradient(W * 0.2, H * 0.78, 0, W * 0.2, H * 0.78, W * 0.55);
-      g1.addColorStop(0, 'rgba(123, 44, 191, 0.18)');
-      g1.addColorStop(0.5, 'rgba(123, 44, 191, 0.06)');
-      g1.addColorStop(1, 'rgba(0,0,0,0)');
-      nctx.fillStyle = g1;
-      nctx.fillRect(0, 0, W, H);
-
-      const g2 = nctx.createRadialGradient(W * 0.82, H * 0.22, 0, W * 0.82, H * 0.22, W * 0.48);
-      g2.addColorStop(0, 'rgba(0, 242, 255, 0.12)');
-      g2.addColorStop(0.5, 'rgba(0, 150, 255, 0.04)');
-      g2.addColorStop(1, 'rgba(0,0,0,0)');
-      nctx.fillStyle = g2;
-      nctx.fillRect(0, 0, W, H);
-
-      const g3 = nctx.createRadialGradient(W * 0.52, H * 0.52, 0, W * 0.52, H * 0.52, W * 0.70);
-      g3.addColorStop(0, 'rgba(255, 107, 157, 0.10)');
-      g3.addColorStop(1, 'rgba(0,0,0,0)');
-      nctx.fillStyle = g3;
-      nctx.fillRect(0, 0, W, H);
-    }
-
-    function drawTunnel() {
-      tctx.clearRect(0, 0, W, H);
-      if (warpSpeed < 6) return;
-
-      const cx = W / 2, cy = H / 2;
-      const intensity = clamp((warpSpeed - 6) / 70, 0, 1);
-
-      // center bloom
-      const core = tctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.45);
-      core.addColorStop(0, `rgba(0, 242, 255, ${0.12 * intensity})`);
-      core.addColorStop(0.35, `rgba(123, 44, 191, ${0.08 * intensity})`);
-      core.addColorStop(0.7, `rgba(255, 107, 157, ${0.06 * intensity})`);
-      core.addColorStop(1, 'rgba(0,0,0,0)');
-      tctx.fillStyle = core;
-      tctx.fillRect(0, 0, W, H);
-
-      // rings
-      const rings = 16;
-      for (let i = 0; i < rings; i++) {
-        const r = (i / rings) * Math.min(W, H) * 0.52 + (Math.sin((time + i * 17) * 0.03) * 6);
-        tctx.globalAlpha = (0.028 + i * 0.002) * intensity;
-        tctx.strokeStyle = i % 3 === 0 ? 'rgba(0,242,255,0.55)' : (i % 3 === 1 ? 'rgba(123,44,191,0.55)' : 'rgba(255,107,157,0.55)');
-        tctx.lineWidth = 1;
-        tctx.beginPath();
-        tctx.arc(cx, cy, r, 0, Math.PI * 2);
-        tctx.stroke();
-      }
-
-      // radial streaks
-      const streaks = 48;
-      tctx.globalAlpha = 0.06 * intensity;
-      for (let i = 0; i < streaks; i++) {
-        const a = (i / streaks) * Math.PI * 2 + time * 0.002;
-        const len = Math.min(W, H) * (0.18 + intensity * 0.22);
-        const x1 = cx + Math.cos(a) * (len * 0.35);
-        const y1 = cy + Math.sin(a) * (len * 0.35);
-        const x2 = cx + Math.cos(a) * (len * 1.0);
-        const y2 = cy + Math.sin(a) * (len * 1.0);
-        tctx.strokeStyle = i % 2 ? 'rgba(0,242,255,0.7)' : 'rgba(255,255,255,0.45)';
-        tctx.beginPath();
-        tctx.moveTo(x1, y1);
-        tctx.lineTo(x2, y2);
-        tctx.stroke();
-      }
-      tctx.globalAlpha = 1;
-    }
-
-    function animate() {
-      time++;
-
-      // trail clear (stronger during warp)
-      const trail = warpSpeed > 10 ? 0.10 : 0.16;
-      uctx.fillStyle = `rgba(5, 5, 5, ${trail})`;
-      uctx.fillRect(0, 0, W, H);
-
-      // ease warp speed
-      warpSpeed += (targetSpeed - warpSpeed) * 0.024;
-
-      for (const s of stars) {
-        s.update(warpSpeed);
-        s.draw();
-      }
-
-      pctx.clearRect(0, 0, W, H);
-      for (const d of dust) {
-        d.update();
-        d.draw(time);
-      }
-
-      drawTunnel();
-      requestAnimationFrame(animate);
-    }
-
-    resizeCanvases();
-    animate();
-
-    /***********************
-     * Entry + Immersion
-     ***********************/
-    const startBtn = document.getElementById('start-btn');
-    const entryScreen = document.getElementById('entry-screen');
-    const mainContent = document.getElementById('main-content');
-    const audio = document.getElementById('bg-music');
-
-    const audioToast = document.getElementById('audio-toast');
-    const enableSoundBtn = document.getElementById('enable-sound');
-
-    let entered = false;
-
-    function doDive() {
-      if (entered) return;
-      entered = true;
-
-      document.body.classList.add('entered');
-
-      // Warp burst
-      warpSpeed = 85;
-      targetSpeed = 85;
-      setTimeout(() => { targetSpeed = 22; }, 1300);
-      setTimeout(() => { targetSpeed = 1.6; }, 3000);
-
-      entryScreen.classList.add('hidden');
-      setTimeout(() => { mainContent.classList.add('visible'); }, 650);
-
-      // Try to start audio (may be blocked)
-      startAudio();
-    }
-
-    startBtn.addEventListener('click', doDive);
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') doDive();
-    });
-
-    /***********************
-     * Visualizer + WebAudio (one-time init)
-     ***********************/
-    const visualizerContainer = document.getElementById('visualizer');
-    const toggleMusicBtn = document.getElementById('toggle-music');
-    const boostWarpBtn = document.getElementById('boost-warp');
-
-    const barCount = 38;
-    const bars = [];
-    for (let i = 0; i < barCount; i++) {
-      const bar = document.createElement('div');
-      bar.className = 'bar';
-      visualizerContainer.appendChild(bar);
-      bars.push(bar);
-    }
-
-    let audioCtx = null;
-    let analyser = null;
-    let dataArray = null;
-    let rafViz = 0;
-
-    function initAudioGraphOnce() {
-      if (audioCtx && analyser && dataArray) return;
-
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-      // createMediaElementSource should be created once per <audio> element
-      const src = audioCtx.createMediaElementSource(audio);
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 128;
-
-      src.connect(analyser);
-      analyser.connect(audioCtx.destination);
-
-      dataArray = new Uint8Array(analyser.frequencyBinCount);
-    }
-
-    function renderViz() {
-      if (!analyser || !dataArray) return;
-
-      analyser.getByteFrequencyData(dataArray);
-      const n = dataArray.length;
-
-      for (let i = 0; i < bars.length; i++) {
-        const v = dataArray[i % n] / 255;
-        const h = 6 + v * 62;
-        bars[i].style.height = h + 'px';
-        bars[i].style.opacity = (0.55 + v * 0.5).toFixed(2);
-      }
-
-      rafViz = requestAnimationFrame(renderViz);
-    }
-
-    async function startAudio() {
-      try {
-        initAudioGraphOnce();
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
-
-        await audio.play();
-        audioToast.classList.remove('show');
-
-        if (!rafViz) renderViz();
-        toggleMusicBtn.textContent = 'Pause';
-      } catch (err) {
-        // Autoplay blocked until additional user gesture
-        audioToast.classList.add('show');
-        toggleMusicBtn.textContent = 'Play';
-      }
-    }
-
-    enableSoundBtn.addEventListener('click', startAudio);
-
-    toggleMusicBtn.addEventListener('click', async () => {
-      if (audio.paused) {
-        await startAudio();
-      } else {
-        audio.pause();
-        toggleMusicBtn.textContent = 'Play';
-      }
-    });
-
-    boostWarpBtn.addEventListener('click', () => {
-      // a short controlled warp burst
-      const prev = targetSpeed;
-      targetSpeed = 60;
-      setTimeout(() => { targetSpeed = 18; }, 900);
-      setTimeout(() => { targetSpeed = prev; }, 1900);
-    });
-
-    /***********************
-     * Scroll progress + subtle nebula parallax
-     ***********************/
-    const scrollProgress = document.getElementById('scroll-progress');
-    let lastScrollY = window.scrollY;
-
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) : 0;
-      scrollProgress.style.transform = `scaleX(${clamp(scrollPercent, 0, 1)})`;
-
-      // Parallax
-      nebula.style.transform = `translateY(${scrollTop * 0.10}px)`;
-      particles.style.transform = `translateY(${scrollTop * 0.04}px)`;
-
-      // tiny speed response to scroll velocity (feels like "moving through" the page)
-      const delta = scrollTop - lastScrollY;
-      lastScrollY = scrollTop;
-      targetSpeed = clamp(1.6 + Math.abs(delta) * 0.02, 1.6, 8);
-      clearTimeout(window.__speedReset);
-      window.__speedReset = setTimeout(() => { targetSpeed = 1.6; }, 120);
-    }, { passive: true });
-
-    /***********************
-     * Custom Cursor (smooth lerp, no per-event animation calls)
-     ***********************/
-    const cursorDot = document.querySelector('[data-cursor-dot]');
-    const cursorOutline = document.querySelector('[data-cursor-outline]');
-    const interactive = document.querySelectorAll('button, a, .hologram-card');
-
-    let mouseX = W / 2, mouseY = H / 2;
-    let outlineX = mouseX, outlineY = mouseY;
-
-    window.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (cursorDot) {
-        cursorDot.style.left = mouseX + 'px';
-        cursorDot.style.top = mouseY + 'px';
-      }
-    }, { passive: true });
-
-    function animateCursor() {
-      // lerp
-      outlineX += (mouseX - outlineX) * 0.14;
-      outlineY += (mouseY - outlineY) * 0.14;
-
-      if (cursorOutline) {
-        cursorOutline.style.left = outlineX + 'px';
-        cursorOutline.style.top = outlineY + 'px';
-      }
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
-
-    interactive.forEach(el => {
-      el.addEventListener('mouseenter', () => cursorOutline && cursorOutline.classList.add('hovering'));
-      el.addEventListener('mouseleave', () => cursorOutline && cursorOutline.classList.remove('hovering'));
-    });
-
-    /***********************
-     * Hologram tilt (complete feature)
-     ***********************/
-    const cards = document.querySelectorAll('.hologram-card');
-    cards.forEach(card => {
-      const maxTilt = 10; // degrees
-
-      function setTilt(e) {
-        const rect = card.getBoundingClientRect();
-        const px = (e.clientX - rect.left) / rect.width;   // 0..1
-        const py = (e.clientY - rect.top) / rect.height;   // 0..1
-        const ry = (px - 0.5) * (maxTilt * 2);
-        const rx = -(py - 0.5) * (maxTilt * 2);
-        card.style.setProperty('--rx', rx.toFixed(2) + 'deg');
-        card.style.setProperty('--ry', ry.toFixed(2) + 'deg');
-      }
-
-      card.addEventListener('pointermove', setTilt);
-      card.addEventListener('pointerleave', () => {
-        card.style.setProperty('--rx', '0deg');
-        card.style.setProperty('--ry', '0deg');
-      });
-
-      // keyboard focus should also look good
-      card.addEventListener('focus', () => {
-        card.style.setProperty('--rx', '0deg');
-        card.style.setProperty('--ry', '0deg');
-      });
-    });
-
-    /***********************
-     * Text Scramble (entry title)
-     ***********************/
-    class TextScramble {
-      constructor(el) {
-        this.el = el;
-        this.chars = '!<>-_\\/[]{}—=+*^?#✦✧★☆';
-        this.update = this.update.bind(this);
-        this.frame = 0;
-        this.queue = [];
-        this.frameRequest = 0;
-        this.resolve = () => {};
-      }
-
-      setText(newText) {
-        const oldText = this.el.innerText;
-        const length = Math.max(oldText.length, newText.length);
-        const promise = new Promise((resolve) => this.resolve = resolve);
-        this.queue = [];
-
-        for (let i = 0; i < length; i++) {
-          const from = oldText[i] || '';
-          const to = newText[i] || '';
-          const start = Math.floor(Math.random() * 32);
-          const end = start + Math.floor(Math.random() * 34);
-          this.queue.push({ from, to, start, end, char: '' });
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Princess Surat | Happy Birthday</title>
+    <meta name="description" content="A cosmic birthday experience for Princess Surat">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Dancing+Script:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --space-black: #030305;
+            --nebula-blue: #0a1a2f;
+            --starlight: #e8e8ff;
+            --cosmic-purple: #7b2cbf;
+            --gravity-cyan: #00f2ff;
+            --gold-accent: #ffd700;
+            --nebula-pink: #ff6b9d;
+            --deep-violet: #4a0080;
+            --royal-magenta: #e040fb;
         }
 
-        cancelAnimationFrame(this.frameRequest);
-        this.frame = 0;
-        this.update();
-        return promise;
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      update() {
-        let output = '';
-        let complete = 0;
+        html {
+            scroll-behavior: smooth;
+        }
 
-        for (let i = 0; i < this.queue.length; i++) {
-          let { from, to, start, end, char } = this.queue[i];
-          if (this.frame >= end) {
-            complete++;
-            output += to;
-          } else if (this.frame >= start) {
-            if (!char || Math.random() < 0.28) {
-              char = this.randomChar();
-              this.queue[i].char = char;
+        body {
+            background-color: var(--space-black);
+            color: var(--starlight);
+            font-family: 'Cinzel', 'Georgia', serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        @media (pointer: fine) {
+            body.entered { cursor: none; }
+        }
+
+        /* --- Custom Cursor --- */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        @media (pointer: fine) {
+            body.entered .cursor-dot,
+            body.entered .cursor-outline {
+                opacity: 1;
             }
-            output += `<span style="color: var(--gravity-cyan); text-shadow: 0 0 10px rgba(0,242,255,0.35);">${char}</span>`;
-          } else {
-            output += from;
-          }
         }
 
-        this.el.innerHTML = output;
-
-        if (complete === this.queue.length) {
-          this.resolve();
-          this.frameRequest = 0;
-        } else {
-          this.frame++;
-          this.frameRequest = requestAnimationFrame(this.update);
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #fff 0%, var(--gravity-cyan) 100%);
+            box-shadow: 
+                0 0 10px var(--gravity-cyan),
+                0 0 20px var(--gravity-cyan),
+                0 0 30px rgba(0, 242, 255, 0.5);
         }
-      }
 
-      randomChar() {
-        return this.chars[Math.floor(Math.random() * this.chars.length)];
-      }
-    }
+        .cursor-outline {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(0, 242, 255, 0.5);
+            background: rgba(0, 242, 255, 0.02);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.15);
+            transition: width 0.25s ease, height 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+        }
 
-    const entryTitle = document.getElementById('entry-title');
-    const scrambler = new TextScramble(entryTitle);
-    setTimeout(() => {
-      scrambler.setText('HAPPY BIRTHDAY, PRINCESS');
-    }, 600);
+        .cursor-outline.hovering {
+            width: 56px;
+            height: 56px;
+            background: rgba(0, 242, 255, 0.08);
+            border-color: var(--gravity-cyan);
+        }
 
-    /***********************
-     * Intersection observer (fade-in)
-     ***********************/
-    const io = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      }
-    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+        /* --- Canvas Layers --- */
+        #universe,
+        #nebula-layer,
+        #particles-layer,
+        #warp-tunnel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        #universe { z-index: -5; }
+        #nebula-layer { z-index: -4; opacity: 0.7; }
+        #particles-layer { z-index: -3; }
+        #warp-tunnel { z-index: -2; opacity: 0; transition: opacity 0.5s ease; mix-blend-mode: screen; }
+        #warp-tunnel.active { opacity: 1; }
 
-    document.querySelectorAll('.fade-in-up').forEach(el => io.observe(el));
-  </script>
+        /* --- Vignette & Grain --- */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.8) 100%);
+        }
+
+        .grain {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            animation: grainShift 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes grainShift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(2px, 2px); }
+        }
+
+        /* --- Scroll Progress --- */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gravity-cyan), var(--cosmic-purple), var(--nebula-pink));
+            z-index: 10001;
+            transform-origin: left;
+            transform: scaleX(0);
+            box-shadow: 0 0 15px var(--gravity-cyan);
+        }
+
+        /* --- Typography --- */
+        h1, h2, h3 {
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1.2s cubic-bezier(0.19, 1, 0.22, 1), transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Entry Screen --- */
+        #entry-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--space-black);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.8s ease, visibility 1.8s, transform 2s cubic-bezier(0.19, 1, 0.22, 1);
+            overflow: hidden;
+        }
+
+        #entry-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(1.5);
+        }
+
+        .entry-portal {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(0, 242, 255, 0.15) 0%, 
+                rgba(123, 44, 191, 0.1) 30%,
+                rgba(255, 107, 157, 0.05) 50%,
+                transparent 70%);
+            animation: portalPulse 3s ease-in-out infinite;
+            filter: blur(1px);
+        }
+
+        @keyframes portalPulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.15); opacity: 1; }
+        }
+
+        .entry-rings {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 50%;
+            animation: ringRotate 25s linear infinite;
+        }
+
+        .entry-rings::before,
+        .entry-rings::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .entry-rings::before {
+            inset: 40px;
+            border: 1px solid rgba(123, 44, 191, 0.2);
+            animation: ringRotate 18s linear infinite reverse;
+        }
+
+        .entry-rings::after {
+            inset: 80px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            animation: ringRotate 12s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .entry-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .entry-subtitle {
+            color: var(--gravity-cyan);
+            font-size: 0.8rem;
+            letter-spacing: 0.5em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .entry-title {
+            font-size: clamp(2rem, 6vw, 4rem);
+            background: linear-gradient(135deg, #ffffff 0%, #c0c0ff 50%, var(--gravity-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 60px rgba(0, 242, 255, 0.3);
+            line-height: 1.2;
+        }
+
+        .entry-title .scramble-char {
+            color: var(--gravity-cyan);
+            -webkit-text-fill-color: var(--gravity-cyan);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.8);
+        }
+
+        .entry-date {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            margin-top: 8px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .entry-btn {
+            margin-top: 40px;
+            padding: 18px 55px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .entry-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.25), transparent);
+            transition: 0.6s;
+        }
+
+        .entry-btn:hover {
+            border-color: var(--gravity-cyan);
+            text-shadow: 0 0 20px var(--gravity-cyan);
+            box-shadow: 
+                0 0 50px rgba(0, 242, 255, 0.25),
+                inset 0 0 30px rgba(0, 242, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .entry-btn:hover::before {
+            left: 100%;
+        }
+
+        /* --- Audio Blocked Toast --- */
+        .audio-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10002;
+            padding: 14px 20px;
+            background: rgba(10, 10, 20, 0.9);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            display: none;
+            align-items: center;
+            gap: 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .audio-toast.show { display: flex; }
+
+        .audio-toast button {
+            padding: 10px 18px;
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid rgba(0, 242, 255, 0.4);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+        }
+
+        .audio-toast button:hover {
+            background: rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        /* --- Main Content --- */
+        .content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 100px 25px 80px;
+            opacity: 0;
+            transition: opacity 2s ease 0.5s;
+        }
+
+        .content-wrapper.visible {
+            opacity: 1;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .main-title {
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
+            margin-bottom: 12px;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, var(--gravity-cyan), var(--cosmic-purple), var(--nebula-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 15px rgba(0, 242, 255, 0.3)); }
+            50% { filter: brightness(1.2) drop-shadow(0 0 25px rgba(123, 44, 191, 0.5)); }
+        }
+
+        .page-subtitle {
+            color: var(--gravity-cyan);
+            font-size: 0.8rem;
+            letter-spacing: 0.4em;
+            opacity: 0.85;
+            text-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+        }
+
+        /* --- Music Player --- */
+        .music-player {
+            background: rgba(255, 255, 255, 0.025);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 25px;
+            padding: 25px;
+            margin: 0 auto 60px;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                inset 0 0 40px rgba(0, 242, 255, 0.02);
+        }
+
+        .track-info {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .track-name {
+            display: block;
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+        }
+
+        .track-artist {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.78rem;
+            font-style: italic;
+        }
+
+        #visualizer {
+            width: 100%;
+            height: 75px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 3px;
+            padding: 0 10px;
+        }
+
+        .bar {
+            width: 4px;
+            background: linear-gradient(to top, var(--deep-violet), var(--cosmic-purple), var(--gravity-cyan));
+            border-radius: 4px;
+            height: 4px;
+            transition: height 0.05s linear;
+            box-shadow: 0 0 8px rgba(0, 242, 255, 0.3);
+        }
+
+        .music-controls {
+            margin-top: 18px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            border-color: rgba(0, 242, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* --- Cosmic Artifacts Grid --- */
+        .artifacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .hologram-card {
+            height: 340px;
+            background: linear-gradient(135deg, rgba(10, 10, 30, 0.5), rgba(20, 10, 45, 0.3));
+            border: 1px solid rgba(0, 242, 255, 0.12);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+            transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+            will-change: transform;
+        }
+
+        .hologram-card:hover {
+            border-color: rgba(0, 242, 255, 0.6);
+            box-shadow: 
+                0 25px 60px rgba(0, 242, 255, 0.15),
+                inset 0 0 60px rgba(0, 242, 255, 0.03);
+        }
+
+        .hologram-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent, rgba(0, 242, 255, 0.06), transparent);
+            transform: translateY(-100%);
+            animation: scanline 4s linear infinite;
+            pointer-events: none;
+        }
+
+        .hologram-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .artifact-svg {
+            width: 200px;
+            height: 200px;
+            filter: drop-shadow(0 0 25px rgba(0, 242, 255, 0.4)) drop-shadow(0 0 50px rgba(123, 44, 191, 0.25));
+            z-index: 1;
+        }
+
+        .hologram-label {
+            position: absolute;
+            bottom: 22px;
+            font-size: 0.72rem;
+            color: var(--gravity-cyan);
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(0, 242, 255, 0.6);
+            z-index: 2;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* --- The Letter --- */
+        .letter-container {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.05));
+            padding: clamp(30px, 5vw, 55px);
+            border-left: 2px solid transparent;
+            border-image: linear-gradient(180deg, var(--gravity-cyan), var(--cosmic-purple), var(--nebula-pink)) 1;
+            margin-top: 50px;
+            position: relative;
+            border-radius: 0 20px 20px 0;
+            box-shadow: 
+                0 0 60px rgba(123, 44, 191, 0.1),
+                inset 0 0 100px rgba(0, 0, 0, 0.3);
+        }
+
+        .letter-container::before {
+            content: '';
+            position: absolute;
+            left: -1px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--gravity-cyan), var(--cosmic-purple), var(--nebula-pink));
+            box-shadow: 0 0 25px var(--cosmic-purple);
+            border-radius: 3px;
+        }
+
+        .letter-container p {
+            margin-bottom: 24px;
+            line-height: 1.95;
+            font-size: clamp(1rem, 2vw, 1.12rem);
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .letter-container p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .letter-container strong {
+            color: var(--gravity-cyan);
+            font-weight: 400;
+        }
+
+        .letter-highlight {
+            color: var(--gravity-cyan);
+            text-shadow: 0 0 12px rgba(0, 242, 255, 0.5);
+        }
+
+        .letter-signature {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* --- Signature --- */
+        .signature {
+            text-align: center;
+            margin-top: 100px;
+            padding-bottom: 60px;
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            background: linear-gradient(45deg, var(--gravity-cyan), var(--cosmic-purple), var(--nebula-pink), var(--gold-accent));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: signatureFlow 6s ease infinite;
+            filter: drop-shadow(0 0 25px rgba(0, 242, 255, 0.3));
+        }
+
+        @keyframes signatureFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* --- Shooting Stars --- */
+        .shooting-star {
+            position: fixed;
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            border-radius: 50%;
+            opacity: 0;
+            z-index: -1;
+            pointer-events: none;
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+        }
+
+        .shooting-star:nth-child(1) { animation: shoot 4s linear infinite 0s; top: 8%; }
+        .shooting-star:nth-child(2) { animation: shoot 4s linear infinite 2s; top: 25%; }
+        .shooting-star:nth-child(3) { animation: shoot 4s linear infinite 3.5s; top: 45%; }
+
+        @keyframes shoot {
+            0% { left: -150px; opacity: 0; transform: rotate(-15deg); }
+            5% { opacity: 1; }
+            25% { opacity: 0; }
+            100% { left: 110vw; opacity: 0; transform: rotate(-15deg) translateY(200px); }
+        }
+
+        /* --- Mobile Optimization --- */
+        @media (max-width: 768px) {
+            .entry-title { font-size: 2rem; }
+            .entry-rings { width: 300px; height: 300px; }
+            .entry-portal { width: 220px; height: 220px; }
+            .letter-container { padding: 25px; }
+            .cursor-dot, .cursor-outline { display: none !important; }
+            .artifacts-grid { gap: 20px; }
+            .hologram-card { height: 300px; }
+            .artifact-svg { width: 160px; height: 160px; }
+        }
+
+        /* --- Reduced Motion --- */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scroll-progress"></div>
+
+    <!-- Background Layers -->
+    <canvas id="universe"></canvas>
+    <canvas id="nebula-layer"></canvas>
+    <canvas id="particles-layer"></canvas>
+    <canvas id="warp-tunnel"></canvas>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+
+    <!-- Shooting Stars -->
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+
+    <!-- Entry Screen -->
+    <div id="entry-screen">
+        <div class="entry-portal"></div>
+        <div class="entry-rings"></div>
+        <div class="entry-content">
+            <p class="entry-subtitle">A BIRTHDAY WRITTEN IN STARLIGHT</p>
+            <h1 class="entry-title" id="entry-title">HAPPY BIRTHDAY</h1>
+            <p class="entry-date" id="entry-date"></p>
+        </div>
+        <button class="entry-btn" id="start-btn">Enter Her Universe</button>
+    </div>
+
+    <!-- Audio Toast -->
+    <div class="audio-toast" id="audio-toast">
+        <span>Sound was blocked. Enable for full experience.</span>
+        <button id="enable-audio-btn">Enable Sound</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="content-wrapper" id="main-content">
+        
+        <header class="title-section fade-in-up">
+            <h1 class="main-title">To <span class="highlight">Princess Surat</span></h1>
+            <p class="page-subtitle">Happy Birthday · Another Orbit Complete</p>
+        </header>
+
+        <!-- Music Player -->
+        <section class="music-player fade-in-up">
+            <div class="track-info">
+                <span class="track-name">Pisces</span>
+                <span class="track-artist">Tony Ann (Slowed & Reverb)</span>
+            </div>
+            <div id="visualizer"></div>
+            <audio id="bg-music" loop preload="auto" crossorigin="anonymous">
+                <source src="Pisces - Tony Ann (Piano Cover).mp3" type="audio/mpeg">
+            </audio>
+            <div class="music-controls">
+                <button class="control-btn" id="toggle-music">Pause</button>
+                <button class="control-btn" id="warp-btn">Warp</button>
+            </div>
+        </section>
+
+        <!-- Cosmic Artifacts -->
+        <section class="artifacts-grid fade-in-up">
+            
+            <!-- Crown Nebula -->
+            <article class="hologram-card" tabindex="0">
+                <svg class="artifact-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="crownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00f2ff" stop-opacity="0.95">
+                                <animate attributeName="stop-color" values="#00f2ff;#7b2cbf;#ff6b9d;#00f2ff" dur="6s" repeatCount="indefinite"/>
+                            </stop>
+                            <stop offset="100%" stop-color="#ffd700" stop-opacity="0.8"/>
+                        </linearGradient>
+                        <filter id="crownGlow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="4" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <radialGradient id="gemGrad" cx="50%" cy="30%" r="50%">
+                            <stop offset="0%" stop-color="#fff"/>
+                            <stop offset="50%" stop-color="#00f2ff"/>
+                            <stop offset="100%" stop-color="#7b2cbf"/>
+                        </radialGradient>
+                    </defs>
+
+                    <!-- Aura -->
+                    <circle cx="100" cy="100" r="85" fill="none" stroke="url(#crownGrad)" stroke-width="1" opacity="0.3">
+                        <animate attributeName="r" values="80;90;80" dur="4s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.2;0.4;0.2" dur="4s" repeatCount="indefinite"/>
+                    </circle>
+
+                    <!-- Crown -->
+                    <g filter="url(#crownGlow)">
+                        <path d="M40 125 L58 75 L85 105 L100 60 L115 105 L142 75 L160 125 Q100 155 40 125 Z" 
+                              fill="url(#crownGrad)" opacity="0.9"/>
+                        <path d="M40 125 Q100 155 160 125" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                        <rect x="50" y="125" width="100" height="14" rx="7" fill="rgba(255,255,255,0.1)" stroke="rgba(0,242,255,0.4)" stroke-width="1"/>
+                        
+                        <!-- Gems -->
+                        <circle cx="58" cy="75" r="5" fill="url(#gemGrad)">
+                            <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="100" cy="60" r="7" fill="url(#gemGrad)">
+                            <animate attributeName="opacity" values="0.8;1;0.8" dur="2.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="142" cy="75" r="5" fill="url(#gemGrad)">
+                            <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+                        </circle>
+                    </g>
+
+                    <!-- Sparkles -->
+                    <g fill="#fff">
+                        <circle cx="35" cy="60" r="1.5" opacity="0">
+                            <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="165" cy="55" r="1.2" opacity="0">
+                            <animate attributeName="opacity" values="0;1;0" dur="2.5s" repeatCount="indefinite" begin="1s"/>
+                        </circle>
+                        <circle cx="100" cy="40" r="1" opacity="0">
+                            <animate attributeName="opacity" values="0;1;0" dur="2.8s" repeatCount="indefinite" begin="0.5s"/>
+                        </circle>
+                        <circle cx="50" cy="160" r="1.3" opacity="0">
+                            <animate attributeName="opacity" values="0;1;0" dur="3.2s" repeatCount="indefinite" begin="1.5s"/>
+                        </circle>
+                        <circle cx="150" cy="155" r="1" opacity="0">
+                            <animate attributeName="opacity" values="0;1;0" dur="2.7s" repeatCount="indefinite" begin="2s"/>
+                        </circle>
+                    </g>
+                </svg>
+                <span class="hologram-label">Crown Nebula</span>
+            </article>
+
+            <!-- Celestial Bloom -->
+            <article class="hologram-card" tabindex="0">
+                <svg class="artifact-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="petalGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00f2ff" stop-opacity="0.9">
+                                <animate attributeName="stop-color" values="#00f2ff;#7b2cbf;#00f2ff" dur="4s" repeatCount="indefinite"/>
+                            </stop>
+                            <stop offset="100%" stop-color="#7b2cbf" stop-opacity="0.6"/>
+                        </linearGradient>
+                        <linearGradient id="petalGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ff6b9d" stop-opacity="0.8"/>
+                            <stop offset="100%" stop-color="#7b2cbf" stop-opacity="0.5"/>
+                        </linearGradient>
+                        <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#fff"/>
+                            <stop offset="40%" stop-color="#ffd700" stop-opacity="0.8"/>
+                            <stop offset="100%" stop-color="#ff6b00" stop-opacity="0.4"/>
+                        </radialGradient>
+                        <filter id="bloomGlow" x="-60%" y="-60%" width="220%" height="220%">
+                            <feGaussianBlur stdDeviation="4" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Outer Aura -->
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="url(#petalGrad1)" stroke-width="0.5" opacity="0.3">
+                        <animate attributeName="r" values="75;85;75" dur="4s" repeatCount="indefinite"/>
+                    </circle>
+
+                    <!-- Outer Petals -->
+                    <g filter="url(#bloomGlow)">
+                        <ellipse cx="100" cy="50" rx="16" ry="40" fill="url(#petalGrad1)" opacity="0.75">
+                            <animate attributeName="ry" values="40;46;40" dur="3s" repeatCount="indefinite"/>
+                        </ellipse>
+                        <ellipse cx="100" cy="50" rx="16" ry="40" fill="url(#petalGrad1)" opacity="0.75" transform="rotate(60 100 100)"/>
+                        <ellipse cx="100" cy="50" rx="16" ry="40" fill="url(#petalGrad1)" opacity="0.75" transform="rotate(120 100 100)"/>
+                        <ellipse cx="100" cy="50" rx="16" ry="40" fill="url(#petalGrad1)" opacity="0.75" transform="rotate(180 100 100)"/>
+                        <ellipse cx="100" cy="50" rx="16" ry="40" fill="url(#petalGrad1)" opacity="0.75" transform="rotate(240 100 100)"/>
+                        <ellipse cx="100" cy="50" rx="16" ry="40" fill="url(#petalGrad1)" opacity="0.75" transform="rotate(300 100 100)"/>
+                    </g>
+
+                    <!-- Inner Petals -->
+                    <g filter="url(#bloomGlow)">
+                        <ellipse cx="100" cy="65" rx="10" ry="25" fill="url(#petalGrad2)" opacity="0.85" transform="rotate(30 100 100)"/>
+                        <ellipse cx="100" cy="65" rx="10" ry="25" fill="url(#petalGrad2)" opacity="0.85" transform="rotate(90 100 100)"/>
+                        <ellipse cx="100" cy="65" rx="10" ry="25" fill="url(#petalGrad2)" opacity="0.85" transform="rotate(150 100 100)"/>
+                        <ellipse cx="100" cy="65" rx="10" ry="25" fill="url(#petalGrad2)" opacity="0.85" transform="rotate(210 100 100)"/>
+                        <ellipse cx="100" cy="65" rx="10" ry="25" fill="url(#petalGrad2)" opacity="0.85" transform="rotate(270 100 100)"/>
+                        <ellipse cx="100" cy="65" rx="10" ry="25" fill="url(#petalGrad2)" opacity="0.85" transform="rotate(330 100 100)"/>
+                    </g>
+
+                    <!-- Core -->
+                    <circle cx="100" cy="100" r="16" fill="url(#coreGrad)" filter="url(#bloomGlow)">
+                        <animate attributeName="r" values="14;18;14" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="100" cy="100" r="7" fill="#fff" opacity="0.9">
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite"/>
+                    </circle>
+
+                    <!-- Orbiting Particles -->
+                    <g>
+                        <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="10s" repeatCount="indefinite"/>
+                        <circle cx="100" cy="25" r="2" fill="#fff" opacity="0.85"/>
+                        <circle cx="175" cy="100" r="1.5" fill="#00f2ff" opacity="0.7"/>
+                        <circle cx="100" cy="175" r="2" fill="#ff6b9d" opacity="0.65"/>
+                        <circle cx="25" cy="100" r="1.2" fill="#ffd700" opacity="0.8"/>
+                    </g>
+                </svg>
+                <span class="hologram-label">Celestial Bloom</span>
+            </article>
+
+            <!-- Astral Compass -->
+            <article class="hologram-card" tabindex="0">
+                <svg class="artifact-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="compassCore" cx="50%" cy="50%" r="60%">
+                            <stop offset="0%" stop-color="#fff" stop-opacity="0.95"/>
+                            <stop offset="40%" stop-color="#00f2ff" stop-opacity="0.4"/>
+                            <stop offset="100%" stop-color="transparent"/>
+                        </radialGradient>
+                        <linearGradient id="needleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#7b2cbf" stop-opacity="0.9"/>
+                            <stop offset="100%" stop-color="#00f2ff" stop-opacity="0.95"/>
+                        </linearGradient>
+                        <filter id="compassGlow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="3" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Outer Rings -->
+                    <g filter="url(#compassGlow)">
+                        <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(0,242,255,0.25)" stroke-width="1"/>
+                        <circle cx="100" cy="100" r="75" fill="rgba(255,255,255,0.02)" stroke="rgba(0,242,255,0.35)" stroke-width="1.5"/>
+                        <circle cx="100" cy="100" r="55" fill="none" stroke="rgba(123,44,191,0.3)" stroke-width="1"/>
+
+                        <!-- Cardinal Markers -->
+                        <g stroke="rgba(255,255,255,0.5)" stroke-width="1.5">
+                            <line x1="100" y1="18" x2="100" y2="32"/>
+                            <line x1="100" y1="168" x2="100" y2="182"/>
+                            <line x1="18" y1="100" x2="32" y2="100"/>
+                            <line x1="168" y1="100" x2="182" y2="100"/>
+                        </g>
+
+                        <!-- Ordinal Markers -->
+                        <g stroke="rgba(255,255,255,0.3)" stroke-width="1">
+                            <line x1="45" y1="45" x2="55" y2="55"/>
+                            <line x1="155" y1="45" x2="145" y2="55"/>
+                            <line x1="45" y1="155" x2="55" y2="145"/>
+                            <line x1="155" y1="155" x2="145" y2="145"/>
+                        </g>
+
+                        <!-- Rotating Needle -->
+                        <g>
+                            <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="20s" repeatCount="indefinite"/>
+                            <path d="M100 35 L115 100 L100 165 L85 100 Z" fill="url(#needleGrad)" opacity="0.85"/>
+                            <circle cx="100" cy="100" r="8" fill="#fff" opacity="0.9"/>
+                        </g>
+
+                        <!-- Center Core -->
+                        <circle cx="100" cy="100" r="18" fill="url(#compassCore)"/>
+                    </g>
+
+                    <!-- Cardinal Labels -->
+                    <g fill="rgba(0,242,255,0.7)" font-family="Orbitron, sans-serif" font-size="8" text-anchor="middle">
+                        <text x="100" y="14">N</text>
+                        <text x="100" y="194">S</text>
+                        <text x="8" y="103">W</text>
+                        <text x="192" y="103">E</text>
+                    </g>
+                </svg>
+                <span class="hologram-label">Astral Compass</span>
+            </article>
+
+        </section>
+
+        <!-- The Letter -->
+        <section class="letter-container fade-in-up">
+            <p><strong>Princess Surat</strong>,</p>
+
+            <p>Today the universe completes another orbit around you — and I say that with full intention. Not the other way around. Because that's how it feels. That's how it's always felt.</p>
+
+            <p>Your beauty isn't the kind people describe with borrowed words. It doesn't fit into "pretty" or "stunning" — those are too small, too ordinary. Yours is the kind that bends attention, that makes a room readjust itself the moment you enter. Like gravity. Like starlight that doesn't ask permission to be seen.</p>
+
+            <p>You're picky. Precise. You know what you want and you don't settle for less — and that's not a flaw, that's royalty. A crown that refuses the wrong head. A princess who knows her throne isn't given; it's claimed. And you wear it effortlessly, even when you don't realize you're wearing it.</p>
+
+            <p>I don't have memories to borrow or scenes to fake. What I have is this: the way you exist. Sharp where you need to be, soft where it matters. A nebula — endless, patient, impossible to ignore. And somehow, impossibly kind underneath all that edge.</p>
+
+            <p>So here's my birthday wish for you, written in the only language I know:</p>
+
+            <p>May this year treat you like a <span class="letter-highlight">constant</span>, not a variable. May the world stop trying to simplify you into something it can understand. May every room you walk into learn your name correctly — not because you demand it, but because your presence makes it <em>necessary</em>.</p>
+
+            <p>Happy Birthday, <span class="letter-highlight">Princess</span>.</p>
+
+            <p>If the cosmos is a cathedral, you're the moment the lights turn on.</p>
+
+            <p class="letter-signature">Always,<br>Dandy</p>
+        </section>
+
+        <div class="signature fade-in-up">
+            With Love, Forever
+        </div>
+
+    </main>
+
+    <script>
+        /* ========================================
+           UTILITIES
+        ======================================== */
+        function clamp(val, min, max) {
+            return Math.max(min, Math.min(max, val));
+        }
+
+        function hexToRgba(hex, alpha) {
+            const h = hex.replace('#', '');
+            const r = parseInt(h.length === 3 ? h[0] + h[0] : h.slice(0, 2), 16);
+            const g = parseInt(h.length === 3 ? h[1] + h[1] : h.slice(2, 4), 16);
+            const b = parseInt(h.length === 3 ? h[2] + h[2] : h.slice(4, 6), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        /* ========================================
+           CANVAS SETUP
+        ======================================== */
+        const universeCanvas = document.getElementById('universe');
+        const nebulaCanvas = document.getElementById('nebula-layer');
+        const particlesCanvas = document.getElementById('particles-layer');
+        const warpCanvas = document.getElementById('warp-tunnel');
+
+        const uCtx = universeCanvas.getContext('2d');
+        const nCtx = nebulaCanvas.getContext('2d');
+        const pCtx = particlesCanvas.getContext('2d');
+        const wCtx = warpCanvas.getContext('2d');
+
+        let W = 0, H = 0, DPR = 1;
+
+        function resizeCanvases() {
+            DPR = Math.min(window.devicePixelRatio || 1, 2);
+            W = window.innerWidth;
+            H = window.innerHeight;
+
+            [universeCanvas, nebulaCanvas, particlesCanvas, warpCanvas].forEach(canvas => {
+                canvas.width = W * DPR;
+                canvas.height = H * DPR;
+                canvas.style.width = W + 'px';
+                canvas.style.height = H + 'px';
+            });
+
+            uCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+            nCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+            pCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+            wCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+            initScene();
+            drawNebula();
+        }
+
+        /* ========================================
+           STARFIELD
+        ======================================== */
+        const STAR_COLORS = ['#ffffff', '#00f2ff', '#7b2cbf', '#ff6b9d', '#ffd700'];
+        const STAR_WEIGHTS = [0.60, 0.15, 0.10, 0.10, 0.05];
+
+        function getStarColor() {
+            const r = Math.random();
+            let sum = 0;
+            for (let i = 0; i < STAR_WEIGHTS.length; i++) {
+                sum += STAR_WEIGHTS[i];
+                if (r <= sum) return STAR_COLORS[i];
+            }
+            return '#ffffff';
+        }
+
+        class Star {
+            constructor(initial = true) {
+                this.reset(initial);
+            }
+
+            reset(initial) {
+                this.x = (Math.random() - 0.5) * W * 2;
+                this.y = (Math.random() - 0.5) * H * 2;
+                this.z = initial ? Math.random() * 2000 : 2000;
+                this.size = Math.random() * 2.2 + 0.5;
+                this.brightness = Math.random() * 0.6 + 0.4;
+                this.color = getStarColor();
+            }
+
+            update(speed) {
+                this.z -= speed;
+                if (this.z <= 1) this.reset(false);
+            }
+
+            draw() {
+                const x = (this.x / this.z) * 600 + W / 2;
+                const y = (this.y / this.z) * 600 + H / 2;
+                const s = (1200 / this.z) * this.size;
+                const alpha = Math.min(1, (2000 - this.z) / 900) * this.brightness;
+
+                if (x < -50 || x > W + 50 || y < -50 || y > H + 50) return;
+
+                // Glow
+                const gradient = uCtx.createRadialGradient(x, y, 0, x, y, s * 3);
+                gradient.addColorStop(0, hexToRgba(this.color, 0.9));
+                gradient.addColorStop(0.4, hexToRgba(this.color, 0.2));
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+                uCtx.globalAlpha = alpha;
+                uCtx.fillStyle = gradient;
+                uCtx.beginPath();
+                uCtx.arc(x, y, s * 3, 0, Math.PI * 2);
+                uCtx.fill();
+
+                // Core
+                uCtx.fillStyle = this.color;
+                uCtx.beginPath();
+                uCtx.arc(x, y, Math.max(0.8, s), 0, Math.PI * 2);
+                uCtx.fill();
+
+                // Warp streaks
+                if (warpSpeed > 12) {
+                    const streakLen = Math.min(warpSpeed * 2.5, 140);
+                    const dx = (x - W / 2) / 50;
+                    const dy = (y - H / 2) / 50;
+                    uCtx.globalAlpha = alpha * 0.5;
+                    uCtx.strokeStyle = hexToRgba(this.color, 0.6);
+                    uCtx.lineWidth = s * 0.6;
+                    uCtx.beginPath();
+                    uCtx.moveTo(x, y);
+                    uCtx.lineTo(x - dx * streakLen, y - dy * streakLen);
+                    uCtx.stroke();
+                }
+            }
+        }
+
+        /* ========================================
+           COSMIC DUST PARTICLES
+        ======================================== */
+        class Dust {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H;
+                this.r = Math.random() * 2.5 + 0.8;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = (Math.random() - 0.5) * 0.2;
+                this.opacity = Math.random() * 0.4 + 0.1;
+                this.pulseSpeed = Math.random() * 0.015 + 0.008;
+                this.pulseOffset = Math.random() * Math.PI * 2;
+                const colors = ['0, 242, 255', '123, 44, 191', '255, 107, 157'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) this.x = W;
+                if (this.x > W) this.x = 0;
+                if (this.y < 0) this.y = H;
+                if (this.y > H) this.y = 0;
+            }
+
+            draw(time) {
+                const pulse = Math.sin(time * this.pulseSpeed + this.pulseOffset) * 0.3 + 0.7;
+                pCtx.globalAlpha = this.opacity * pulse;
+                pCtx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+                pCtx.beginPath();
+                pCtx.arc(this.x, this.y, this.r * pulse, 0, Math.PI * 2);
+                pCtx.fill();
+            }
+        }
+
+        let stars = [];
+        let dust = [];
+        let warpSpeed = 0;
+        let targetSpeed = 1.5;
+        let time = 0;
+
+        function initScene() {
+            const starCount = clamp(Math.floor((W * H) / 2000), 500, 1000);
+            stars = Array.from({ length: starCount }, () => new Star(true));
+            dust = Array.from({ length: 50 }, () => new Dust());
+
+            uCtx.fillStyle = 'rgba(3, 3, 5, 1)';
+            uCtx.fillRect(0, 0, W, H);
+        }
+
+        function drawNebula() {
+            nCtx.clearRect(0, 0, W, H);
+
+            // Purple nebula
+            const g1 = nCtx.createRadialGradient(W * 0.2, H * 0.8, 0, W * 0.2, H * 0.8, W * 0.55);
+            g1.addColorStop(0, 'rgba(123, 44, 191, 0.18)');
+            g1.addColorStop(0.5, 'rgba(123, 44, 191, 0.06)');
+            g1.addColorStop(1, 'transparent');
+            nCtx.fillStyle = g1;
+            nCtx.fillRect(0, 0, W, H);
+
+            // Cyan nebula
+            const g2 = nCtx.createRadialGradient(W * 0.85, H * 0.2, 0, W * 0.85, H * 0.2, W * 0.45);
+            g2.addColorStop(0, 'rgba(0, 242, 255, 0.12)');
+            g2.addColorStop(0.5, 'rgba(0, 150, 255, 0.04)');
+            g2.addColorStop(1, 'transparent');
+            nCtx.fillStyle = g2;
+            nCtx.fillRect(0, 0, W, H);
+
+            // Pink nebula
+            const g3 = nCtx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, W * 0.6);
+            g3.addColorStop(0, 'rgba(255, 107, 157, 0.08)');
+            g3.addColorStop(1, 'transparent');
+            nCtx.fillStyle = g3;
+            nCtx.fillRect(0, 0, W, H);
+        }
+
+        function drawWarpTunnel() {
+            wCtx.clearRect(0, 0, W, H);
+            if (warpSpeed < 8) return;
+
+            const cx = W / 2, cy = H / 2;
+            const intensity = clamp((warpSpeed - 8) / 70, 0, 1);
+
+            // Central bloom
+            const core = wCtx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.5);
+            core.addColorStop(0, `rgba(0, 242, 255, ${0.15 * intensity})`);
+            core.addColorStop(0.3, `rgba(123, 44, 191, ${0.1 * intensity})`);
+            core.addColorStop(0.6, `rgba(255, 107, 157, ${0.06 * intensity})`);
+            core.addColorStop(1, 'transparent');
+            wCtx.fillStyle = core;
+            wCtx.fillRect(0, 0, W, H);
+
+            // Rings
+            for (let i = 0; i < 20; i++) {
+                const r = (i / 20) * Math.min(W, H) * 0.55 + Math.sin((time + i * 20) * 0.025) * 8;
+                wCtx.globalAlpha = (0.02 + i * 0.002) * intensity;
+                wCtx.strokeStyle = i % 3 === 0 ? 'rgba(0,242,255,0.6)' : (i % 3 === 1 ? 'rgba(123,44,191,0.6)' : 'rgba(255,107,157,0.6)');
+                wCtx.lineWidth = 1;
+                wCtx.beginPath();
+                wCtx.arc(cx, cy, r, 0, Math.PI * 2);
+                wCtx.stroke();
+            }
+
+            // Radial lines
+            wCtx.globalAlpha = 0.08 * intensity;
+            for (let i = 0; i < 60; i++) {
+                const angle = (i / 60) * Math.PI * 2 + time * 0.0015;
+                const len = Math.min(W, H) * (0.2 + intensity * 0.25);
+                const x1 = cx + Math.cos(angle) * len * 0.4;
+                const y1 = cy + Math.sin(angle) * len * 0.4;
+                const x2 = cx + Math.cos(angle) * len;
+                const y2 = cy + Math.sin(angle) * len;
+                wCtx.strokeStyle = i % 2 ? 'rgba(0,242,255,0.8)' : 'rgba(255,255,255,0.5)';
+                wCtx.beginPath();
+                wCtx.moveTo(x1, y1);
+                wCtx.lineTo(x2, y2);
+                wCtx.stroke();
+            }
+            wCtx.globalAlpha = 1;
+        }
+
+        function animate() {
+            time++;
+
+            // Trail effect
+            const trail = warpSpeed > 12 ? 0.08 : 0.15;
+            uCtx.fillStyle = `rgba(3, 3, 5, ${trail})`;
+            uCtx.fillRect(0, 0, W, H);
+
+            // Ease warp speed
+            warpSpeed += (targetSpeed - warpSpeed) * 0.025;
+
+            // Update and draw stars
+            for (const star of stars) {
+                star.update(warpSpeed);
+                star.draw();
+            }
+
+            // Update and draw dust
+            pCtx.clearRect(0, 0, W, H);
+            for (const d of dust) {
+                d.update();
+                d.draw(time);
+            }
+
+            // Warp tunnel
+            drawWarpTunnel();
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resizeCanvases);
+        resizeCanvases();
+        animate();
+
+        /* ========================================
+           ENTRY EXPERIENCE
+        ======================================== */
+        const entryScreen = document.getElementById('entry-screen');
+        const startBtn = document.getElementById('start-btn');
+        const mainContent = document.getElementById('main-content');
+        const warpTunnel = document.getElementById('warp-tunnel');
+        const entryTitle = document.getElementById('entry-title');
+        const entryDate = document.getElementById('entry-date');
+
+        // Set current date
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        entryDate.textContent = now.toLocaleDateString('en-US', options);
+
+        let hasEntered = false;
+
+        function enterExperience() {
+            if (hasEntered) return;
+            hasEntered = true;
+
+            document.body.classList.add('entered');
+
+            // Warp effect
+            warpTunnel.classList.add('active');
+            warpSpeed = 90;
+            targetSpeed = 90;
+
+            setTimeout(() => { targetSpeed = 25; }, 1200);
+            setTimeout(() => { 
+                targetSpeed = 1.5; 
+                warpTunnel.classList.remove('active');
+            }, 2800);
+
+            // UI transition
+            entryScreen.classList.add('hidden');
+            setTimeout(() => {
+                mainContent.classList.add('visible');
+            }, 800);
+
+            // Start audio
+            startAudio();
+        }
+
+        startBtn.addEventListener('click', enterExperience);
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') enterExperience();
+        });
+
+        /* ========================================
+           TEXT SCRAMBLE EFFECT
+        ======================================== */
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#✦✧★☆◆◇';
+                this.update = this.update.bind(this);
+                this.queue = [];
+                this.frame = 0;
+                this.frameRequest = 0;
+                this.resolve = () => {};
+            }
+
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                this.queue = [];
+
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end, char: '' });
+                }
+
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return new Promise(resolve => this.resolve = resolve);
+            }
+
+            update() {
+                let output = '';
+                let complete = 0;
+
+                for (let i = 0; i < this.queue.length; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) {
+                            char = this.chars[Math.floor(Math.random() * this.chars.length)];
+                            this.queue[i].char = char;
+                        }
+                        output += `<span class="scramble-char">${char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+
+                this.el.innerHTML = output;
+
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+        }
+
+        const scrambler = new TextScramble(entryTitle);
+        setTimeout(() => {
+            scrambler.setText('HAPPY BIRTHDAY, PRINCESS');
+        }, 800);
+
+        /* ========================================
+           AUDIO SYSTEM
+        ======================================== */
+        const audio = document.getElementById('bg-music');
+        const visualizerContainer = document.getElementById('visualizer');
+        const toggleMusicBtn = document.getElementById('toggle-music');
+        const warpBtn = document.getElementById('warp-btn');
+        const audioToast = document.getElementById('audio-toast');
+        const enableAudioBtn = document.getElementById('enable-audio-btn');
+
+        // Create visualizer bars
+        const barCount = 38;
+        const bars = [];
+        for (let i = 0; i < barCount; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            visualizerContainer.appendChild(bar);
+            bars.push(bar);
+        }
+
+        let audioCtx = null;
+        let analyser = null;
+        let dataArray = null;
+        let audioInitialized = false;
+
+        function initAudio() {
+            if (audioInitialized) return;
+            audioInitialized = true;
+
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioCtx.createMediaElementSource(audio);
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 128;
+
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            renderVisualizer();
+        }
+
+        function renderVisualizer() {
+            if (!analyser || !dataArray) return;
+
+            analyser.getByteFrequencyData(dataArray);
+            const len = dataArray.length;
+
+            for (let i = 0; i < bars.length; i++) {
+                const value = dataArray[i % len] / 255;
+                const height = 4 + value * 65;
+                bars[i].style.height = height + 'px';
+                bars[i].style.opacity = (0.5 + value * 0.5).toFixed(2);
+            }
+
+            requestAnimationFrame(renderVisualizer);
+        }
+
+        async function startAudio() {
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    await audioCtx.resume();
+                }
+                await audio.play();
+                audioToast.classList.remove('show');
+                toggleMusicBtn.textContent = 'Pause';
+            } catch (err) {
+                console.log('Audio blocked:', err);
+                audioToast.classList.add('show');
+                toggleMusicBtn.textContent = 'Play';
+            }
+        }
+
+        enableAudioBtn.addEventListener('click', startAudio);
+
+        toggleMusicBtn.addEventListener('click', async () => {
+            if (audio.paused) {
+                await startAudio();
+            } else {
+                audio.pause();
+                toggleMusicBtn.textContent = 'Play';
+            }
+        });
+
+        warpBtn.addEventListener('click', () => {
+            const prev = targetSpeed;
+            targetSpeed = 65;
+            warpTunnel.classList.add('active');
+            setTimeout(() => { targetSpeed = 20; }, 800);
+            setTimeout(() => { 
+                targetSpeed = prev; 
+                warpTunnel.classList.remove('active');
+            }, 1800);
+        });
+
+        /* ========================================
+           CUSTOM CURSOR
+        ======================================== */
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+        const interactiveElements = document.querySelectorAll('button, a, .hologram-card');
+
+        let mouseX = W / 2, mouseY = H / 2;
+        let outlineX = mouseX, outlineY = mouseY;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.left = mouseX + 'px';
+            cursorDot.style.top = mouseY + 'px';
+        }, { passive: true });
+
+        function animateCursor() {
+            outlineX += (mouseX - outlineX) * 0.12;
+            outlineY += (mouseY - outlineY) * 0.12;
+            cursorOutline.style.left = outlineX + 'px';
+            cursorOutline.style.top = outlineY + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursorOutline.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => cursorOutline.classList.remove('hovering'));
+        });
+
+        /* ========================================
+           HOLOGRAM CARD TILT
+        ======================================== */
+        const hologramCards = document.querySelectorAll('.hologram-card');
+        const maxTilt = 12;
+
+        hologramCards.forEach(card => {
+            card.addEventListener('pointermove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const px = (e.clientX - rect.left) / rect.width;
+                const py = (e.clientY - rect.top) / rect.height;
+                const ry = (px - 0.5) * maxTilt * 2;
+                const rx = -(py - 0.5) * maxTilt * 2;
+                card.style.setProperty('--rx', rx + 'deg');
+                card.style.setProperty('--ry', ry + 'deg');
+            });
+
+            card.addEventListener('pointerleave', () => {
+                card.style.setProperty('--rx', '0deg');
+                card.style.setProperty('--ry', '0deg');
+            });
+        });
+
+        /* ========================================
+           SCROLL EFFECTS
+        ======================================== */
+        const scrollProgress = document.getElementById('scroll-progress');
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = docHeight > 0 ? scrollTop / docHeight : 0;
+
+            scrollProgress.style.transform = `scaleX(${clamp(scrollPercent, 0, 1)})`;
+
+            // Parallax
+            nebulaCanvas.style.transform = `translateY(${scrollTop * 0.08}px)`;
+            particlesCanvas.style.transform = `translateY(${scrollTop * 0.03}px)`;
+        }, { passive: true });
+
+        /* ========================================
+           INTERSECTION OBSERVER
+        ======================================== */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+    </script>
 </body>
 </html>
